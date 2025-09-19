@@ -189,6 +189,13 @@ export default function ProctoredExamComponent() {
 
   const handleSubmit = async () => {
     if (isSubmitting) return;
+
+    // ✅ confirmation before submitting
+    const confirmSubmit = window.confirm(
+      'Are you sure you want to submit the exam? You will not be able to change your answers after submitting.',
+    );
+    if (!confirmSubmit) return;
+
     setIsSubmitting(true);
 
     try {
