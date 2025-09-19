@@ -1,0 +1,548 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model PendingUser {
+  Email String @db.VarChar(200)
+
+  @@ignore
+}
+
+model Batch {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(150)
+  start_time Float    @db.Float
+  end_time   Float    @db.Float
+  entry_time DateTime @default(now()) @db.Timestamp(0)
+
+  @@map("batch")
+}
+
+model BatchExam {
+  id      Int @id @default(autoincrement())
+  batchid Int
+  examid  Int
+
+  @@map("batch_exam")
+}
+
+model Category {
+  id             Int             @id @default(autoincrement())
+  name           String          @db.VarChar(150)
+  description    String          @db.VarChar(100)
+  entry_date     DateTime        @db.Date
+  question_label QuestionLabel[]
+  questions      Questions[]
+
+  @@map("category")
+}
+
+model ElixirLA {
+  email    String @id @db.VarChar(250)
+  stname   String @db.VarChar(250)
+  phone    String @db.VarChar(12)
+  gender   String @db.VarChar(8)
+  gname    String @db.VarChar(250)
+  gphone   String @db.VarChar(12)
+  gemail   String @db.VarChar(250)
+  stclass  String @db.VarChar(25)
+  stdisc   String @db.VarChar(25)
+  password String @db.VarChar(10)
+
+  @@map("elixirla")
+}
+
+model ElixirLB {
+  email    String @id @db.VarChar(250)
+  stname   String @db.VarChar(250)
+  phone    String @db.VarChar(12)
+  gender   String @db.VarChar(8)
+  gname    String @db.VarChar(250)
+  gphone   String @db.VarChar(12)
+  gemail   String @db.VarChar(250)
+  stclass  String @db.VarChar(25)
+  stdisc   String @db.VarChar(25)
+  password String @db.VarChar(10)
+
+  @@map("elixirlb")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ExamDownload {
+  uid          Int       @id @default(autoincrement())
+  downloadtime DateTime? @default(now()) @db.DateTime(0)
+  uploadtime   DateTime? @db.DateTime(0)
+  id_exam      Int?
+  exams        Exams?    @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "exam_download_ibfk_1")
+
+  @@index([id_exam], map: "id_exam")
+  @@map("exam_download")
+}
+
+model ExamRecord {
+  id           Int        @id @default(autoincrement())
+  id_exam      Int
+  id_user      Int
+  mark         Float      @db.Float
+  rank         Int
+  percent      Float      @db.Float
+  correct_ans  Int
+  wrong_ans    Int
+  not_answered Int
+  max_mark     Float      @db.Float
+  qns_no       Int
+  attempted_no Int
+  correct_no   Int
+  wrong_no     Int
+  entry_time   DateTime   @default(now()) @db.Timestamp(0)
+  exams        Exams      @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "exam_record_ibfk_1")
+  online_user  OnlineUser @relation(fields: [id_user], references: [uid], onDelete: Cascade, map: "exam_record_ibfk_2")
+
+  @@index([id_exam, id_user], map: "id_exam")
+  @@index([id_user], map: "id_user")
+  @@map("exam_record")
+}
+
+model ExamSections {
+  id                    Int                    @id @default(autoincrement())
+  id_exam               Int?
+  id_section            Int?
+  qns_no                Int?
+  max_time              Float?                 @db.Float
+  assignquestion_status Int?
+  assignlabel_status    Int                    @default(0)
+  appear_order          Int?
+  exams                 Exams?                 @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "exam_sections_ibfk_1")
+  sections              Sections?              @relation(fields: [id_section], references: [id], onDelete: Cascade, map: "exam_sections_ibfk_2")
+  exam_sessions         ExamSessions[]
+  examsection_questions ExamsectionQuestions[]
+  question_label        QuestionLabel[]
+
+  @@index([id_exam, id_section], map: "id_exam")
+  @@index([id_section], map: "id_section")
+  @@map("exam_sections")
+}
+
+model ExamSessions {
+  id            Int          @id @default(autoincrement())
+  id_exam       Int
+  id_user       Int
+  id_section    Int
+  id_question   Int
+  question_no   Int
+  id_answer     Int
+  status        Int
+  ans_status    Int
+  mark          Float        @db.Float
+  entry_time    DateTime     @default(now()) @db.Timestamp(0)
+  online_user   OnlineUser   @relation(fields: [id_user], references: [uid], onDelete: Cascade, map: "exam_sessions_ibfk_1")
+  exams         Exams        @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "exam_sessions_ibfk_2")
+  exam_sections ExamSections @relation(fields: [id_section], references: [id], onDelete: Cascade, map: "exam_sessions_ibfk_3")
+  questions     Questions    @relation(fields: [id_question], references: [id], onDelete: Cascade, map: "exam_sessions_ibfk_4")
+  propositions  Propositions @relation(fields: [id_answer], references: [id], onDelete: Cascade, map: "exam_sessions_ibfk_5")
+
+  @@index([id_exam, id_user, id_section, id_question, id_answer], map: "id_exam")
+  @@index([id_question], map: "id_question")
+  @@index([id_section], map: "id_section")
+  @@index([id_user], map: "id_user")
+  @@index([id_answer], map: "id_answer")
+  @@map("exam_sessions")
+}
+
+model ExamUsers {
+  id             Int        @id @default(autoincrement())
+  id_user        Int
+  id_exam        Int
+  attend_status  Int
+  pending_status Int        @default(1)
+  online_user    OnlineUser @relation(fields: [id_user], references: [uid], onDelete: Cascade, map: "exam_users_ibfk_1")
+  exams          Exams      @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "exam_users_ibfk_2")
+
+  @@index([id_exam], map: "id_exam")
+  @@index([id_user, id_exam], map: "id_user")
+  @@map("exam_users")
+}
+
+model Exams {
+  id                    Int                    @id @default(autoincrement())
+  id_parent             Int?
+  name                  String                 @db.VarChar(50)
+  parent_name           String?                @db.VarChar(100)
+  description           String                 @db.Text
+  published             Int?
+  type                  Int?
+  access_id             Int?
+  notify_msg            String                 @db.Text
+  publish_date          DateTime               @db.Date
+  unpublish_date        DateTime               @db.Date
+  sectionassign_status  Int?
+  userassign_status     Int?
+  transferable          Int?
+  max_time              Float?                 @db.Float
+  qns_no                Int?
+  sec_no                Int?
+  sec_time              Float?                 @db.Float
+  allow                 Int?
+  result                Int?
+  report_filter         Int?
+  exam_download         ExamDownload[]
+  exam_record           ExamRecord[]
+  exam_sections         ExamSections[]
+  exam_sessions         ExamSessions[]
+  exam_users            ExamUsers[]
+  examsection_questions ExamsectionQuestions[]
+  question_label        QuestionLabel[]
+  random_questions      RandomQuestions[]
+  random_sections       RandomSections[]
+  section_record        SectionRecord[]
+  temp_examquestions    TempExamquestions[]
+  temp_examreport       TempExamreport[]
+  time_status           TimeStatus[]
+
+  @@map("exams")
+}
+
+model ExamsectionQuestions {
+  id                    Int          @id @default(autoincrement())
+  id_exam               Int
+  id_examsection        Int
+  id_question           Int
+  assignquestion_status Int
+  appear_order          Int
+  exams                 Exams        @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "examsection_questions_ibfk_1")
+  questions             Questions    @relation(fields: [id_question], references: [id], onDelete: Cascade, map: "examsection_questions_ibfk_2")
+  exam_sections         ExamSections @relation(fields: [id_examsection], references: [id], onDelete: Cascade, map: "examsection_questions_ibfk_3")
+
+  @@index([id_exam, id_examsection, id_question], map: "id_exam")
+  @@index([id_examsection], map: "id_examsection")
+  @@index([id_question], map: "id_question")
+  @@map("examsection_questions")
+}
+
+model OnlineUser {
+  uid                Int                 @id @default(autoincrement())
+  first_name         String?             @db.VarChar(30)
+  last_name          String?             @db.VarChar(50)
+  username           String?             @db.VarChar(100)
+  password           String?             @db.VarChar(300)
+  user_password      String?             @db.VarChar(150)
+  batch              Int?
+  origin_batch       String?             @db.VarChar(150)
+  semester           Int
+  email              String?             @db.VarChar(50)
+  contact_no         String?             @db.VarChar(30)
+  parent_contact_no  String?             @db.VarChar(30)
+  dob                String?             @db.VarChar(30)
+  login_status       Int?
+  type               String?             @db.VarChar(30)
+  mobile_number      String?             @db.VarChar(30)
+  address            String?             @db.VarChar(200)
+  caption_image      String?             @db.VarChar(200)
+  exam_counter       Int?
+  city               String?             @db.VarChar(150)
+  entry_time         DateTime            @default(dbgenerated("'1970-01-01 01:01:01'")) @db.DateTime(0)
+  dist               String?             @db.VarChar(150)
+  state              String?             @db.VarChar(150)
+  pin_code           String?             @db.VarChar(150)
+  status             Int?
+  mode               Int                 @default(1)
+  exam_record        ExamRecord[]
+  exam_sessions      ExamSessions[]
+  exam_users         ExamUsers[]
+  section_record     SectionRecord[]
+  temp_examquestions TempExamquestions[]
+  temp_examreport    TempExamreport[]
+  time_status        TimeStatus[]
+
+  @@map("online_user")
+}
+
+model OriginBatch {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(150)
+  start_time Float    @db.Float
+  end_time   Float    @db.Float
+  entry_time DateTime @default(now()) @db.Timestamp(0)
+
+  @@map("origin_batch")
+}
+
+model OsbicLA {
+  email    String @id @db.VarChar(250)
+  stname   String @db.VarChar(250)
+  phone    String @db.VarChar(12)
+  gender   String @db.VarChar(8)
+  gname    String @db.VarChar(250)
+  gphone   String @db.VarChar(12)
+  gemail   String @db.VarChar(250)
+  stclass  String @db.VarChar(25)
+  stdisc   String @db.VarChar(25)
+  password String @db.VarChar(10)
+
+  @@map("osbicla")
+}
+
+model OsbicLB {
+  email    String @id @db.VarChar(250)
+  stname   String @db.VarChar(250)
+  phone    String @db.VarChar(12)
+  gender   String @db.VarChar(8)
+  gname    String @db.VarChar(250)
+  gphone   String @db.VarChar(12)
+  gemail   String @db.VarChar(250)
+  stclass  String @db.VarChar(25)
+  stdisc   String @db.VarChar(25)
+  password String @db.VarChar(10)
+
+  @@map("osbiclb")
+}
+
+model OtherCandidates {
+  id       Int    @id @default(autoincrement())
+  username String @db.VarChar(30)
+  password String @db.VarChar(30)
+
+  @@map("other_candidates")
+}
+
+model Propositions {
+  id            Int            @id @default(autoincrement())
+  answer        String         @db.Text
+  correct       Int            @db.TinyInt
+  id_question   Int
+  exam_sessions ExamSessions[]
+  questions     Questions      @relation(fields: [id_question], references: [id], onDelete: Cascade, map: "propositions_ibfk_1")
+
+  @@index([id_question], map: "id_question")
+  @@map("propositions")
+}
+
+model QuestionCompile {
+  id_question   Int       @id
+  sample_input  String    @db.VarChar(500)
+  sample_output String    @db.VarChar(500)
+  questions     Questions @relation(fields: [id_question], references: [id], onDelete: Cascade, map: "question_compile_ibfk_1")
+
+  @@map("question_compile")
+}
+
+model QuestionLabel {
+  id             Int           @id @default(autoincrement())
+  id_exam        Int?
+  id_section     Int?
+  id_examsection Int?
+  id_category    Int?
+  qns_no         Int?
+  exams          Exams?        @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "question_label_ibfk_1")
+  sections       Sections?     @relation(fields: [id_section], references: [id], onDelete: Cascade, map: "question_label_ibfk_2")
+  exam_sections  ExamSections? @relation(fields: [id_examsection], references: [id], onDelete: Cascade, map: "question_label_ibfk_3")
+  category       Category?     @relation(fields: [id_category], references: [id], onDelete: Cascade, map: "question_label_ibfk_4")
+
+  @@index([id_category], map: "id_category")
+  @@index([id_exam, id_section, id_examsection, id_category], map: "id_exam")
+  @@index([id_examsection], map: "id_examsection")
+  @@index([id_section], map: "id_section")
+  @@map("question_label")
+}
+
+model Questions {
+  id                    Int                    @id @default(autoincrement())
+  description           String                 @db.Text
+  id_section            Int
+  id_category           Int
+  positive_mark         Float                  @db.Float
+  negative_mark         Float                  @db.Float
+  options               Int
+  qtype                 Int?
+  exam_sessions         ExamSessions[]
+  examsection_questions ExamsectionQuestions[]
+  propositions          Propositions[]
+  question_compile      QuestionCompile?
+  sections              Sections               @relation(fields: [id_section], references: [id], onDelete: Cascade, map: "questions_ibfk_1")
+  category              Category               @relation(fields: [id_category], references: [id], onDelete: Cascade, map: "questions_ibfk_2")
+  random_questions      RandomQuestions[]
+  time_status           TimeStatus[]
+
+  @@index([id_category], map: "id_category")
+  @@index([id_section, id_category], map: "id_section")
+  @@map("questions")
+}
+
+model QuestionsType {
+  id   Int    @id
+  name String @db.VarChar(25)
+
+  @@map("questions_type")
+}
+
+model RandomQuestions {
+  id          Int       @id @default(autoincrement())
+  id_exam     Int
+  id_question Int
+  questions   Questions @relation(fields: [id_question], references: [id], onDelete: Cascade, map: "random_questions_ibfk_1")
+  exams       Exams     @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "random_questions_ibfk_2")
+
+  @@index([id_exam, id_question], map: "id_exam")
+  @@index([id_question], map: "id_question")
+  @@map("random_questions")
+}
+
+model RandomSections {
+  id         Int      @id @default(autoincrement())
+  id_exam    Int
+  id_section Int
+  qns_no     Int
+  exams      Exams    @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "random_sections_ibfk_1")
+  sections   Sections @relation(fields: [id_section], references: [id], onDelete: Cascade, map: "random_sections_ibfk_2")
+
+  @@index([id_exam, id_section], map: "id_exam")
+  @@index([id_section], map: "id_section")
+  @@map("random_sections")
+}
+
+model SectionRecord {
+  id          Int        @id @default(autoincrement())
+  id_exam     Int
+  id_section  Int
+  id_user     Int
+  mark        Float
+  rank        Int
+  percent     Float      @db.Float
+  entry_time  DateTime   @default(now()) @db.Timestamp(0)
+  exams       Exams      @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "section_record_ibfk_1")
+  sections    Sections   @relation(fields: [id_section], references: [id], onDelete: Cascade, map: "section_record_ibfk_2")
+  online_user OnlineUser @relation(fields: [id_user], references: [uid], onDelete: Cascade, map: "section_record_ibfk_3")
+
+  @@index([id_exam, id_section, id_user], map: "id_exam")
+  @@index([id_section], map: "id_section")
+  @@index([id_user], map: "id_user")
+  @@map("section_record")
+}
+
+model Sections {
+  id                 Int                 @id @default(autoincrement())
+  name               String              @db.VarChar(150)
+  description        String              @db.VarChar(100)
+  entry_date         DateTime            @db.Date
+  exam_sections      ExamSections[]
+  question_label     QuestionLabel[]
+  questions          Questions[]
+  random_sections    RandomSections[]
+  section_record     SectionRecord[]
+  temp_examquestions TempExamquestions[]
+  time_status        TimeStatus[]
+
+  @@map("sections")
+}
+
+model Semester {
+  id       Int    @id @default(autoincrement())
+  semester String @db.VarChar(256)
+
+  @@map("semester")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model SType {
+  status String @db.VarChar(15)
+
+  @@map("stype")
+  @@ignore
+}
+
+model TempExamquestions {
+  id          Int         @id @default(autoincrement())
+  id_exam     Int?
+  id_user     Int?
+  id_section  Int?
+  id_question String?     @db.VarChar(10)
+  question_no Int?
+  entry_time  DateTime?   @default(now()) @db.Timestamp(0)
+  exams       Exams?      @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "temp_examquestions_ibfk_1")
+  online_user OnlineUser? @relation(fields: [id_user], references: [uid], onDelete: Cascade, map: "temp_examquestions_ibfk_2")
+  sections    Sections?   @relation(fields: [id_section], references: [id], onDelete: Cascade, map: "temp_examquestions_ibfk_3")
+
+  @@index([id_exam, id_user, id_section, id_question], map: "id_exam")
+  @@index([id_section], map: "id_section")
+  @@index([id_user], map: "id_user")
+  @@map("temp_examquestions")
+}
+
+model TempExamreport {
+  id          Int        @id @default(autoincrement())
+  id_exam     Int
+  id_user     Int
+  numbers     String     @db.Text
+  entry_time  DateTime   @default(now()) @db.Timestamp(0)
+  exams       Exams      @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "temp_examreport_ibfk_1")
+  online_user OnlineUser @relation(fields: [id_user], references: [uid], onDelete: Cascade, map: "temp_examreport_ibfk_2")
+
+  @@index([id_exam, id_user], map: "id_exam")
+  @@index([id_user], map: "id_user")
+  @@map("temp_examreport")
+}
+
+model TimeStatus {
+  id          Int        @id @default(autoincrement())
+  id_exam     Int
+  id_section  Int
+  id_question Int
+  question_no Int
+  id_user     Int
+  halt_time   Float      @db.Float
+  entry_time  DateTime   @default(now()) @db.Timestamp(0)
+  exams       Exams      @relation(fields: [id_exam], references: [id], onDelete: Cascade, map: "time_status_ibfk_1")
+  sections    Sections   @relation(fields: [id_section], references: [id], onDelete: Cascade, map: "time_status_ibfk_2")
+  questions   Questions  @relation(fields: [id_question], references: [id], onDelete: Cascade, map: "time_status_ibfk_3")
+  online_user OnlineUser @relation(fields: [id_user], references: [uid], onDelete: Cascade, map: "time_status_ibfk_4")
+
+  @@index([id_exam, id_section, id_question, id_user], map: "id_exam")
+  @@index([id_question], map: "id_question")
+  @@index([id_section], map: "id_section")
+  @@index([id_user], map: "id_user")
+  @@map("time_status")
+}
+
+model TMQ {
+  email    String @id @db.VarChar(250)
+  stname   String @db.VarChar(250)
+  phone    String @db.VarChar(12)
+  gender   String @db.VarChar(8)
+  gname    String @db.VarChar(250)
+  gphone   String @db.VarChar(12)
+  gemail   String @db.VarChar(250)
+  stclass  String @db.VarChar(25)
+  stdisc   String @db.VarChar(25)
+  password String @db.VarChar(10)
+
+  @@map("tmq")
+}
+
+model User {
+  uid          Int    @id @default(autoincrement())
+  user         String @db.VarChar(20)
+  pass         String @db.VarChar(100)
+  name         String @db.VarChar(20)
+  email        String @db.VarChar(50)
+  status       String @db.VarChar(100)
+  type         Int
+  login_status Int
+
+  @@map("user")
+}
+
+model UserProfile {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(100)
+  username String @db.VarChar(100)
+  password String @db.VarChar(100)
+  email_id String @db.VarChar(50)
+
+  @@map("user_profile")
+}
