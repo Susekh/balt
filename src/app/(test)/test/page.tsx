@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Clock, AlertTriangle, CheckCircle, Eye } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useConfirm } from '@/app/(admin)/components/dialog/confirm-dialog';
 
 // Types
 type ContentItem = {
@@ -51,6 +52,7 @@ export default function ProctoredExamComponent() {
   const [tabSwitches, setTabSwitches] = useState(0);
   const [suspiciousActivity, setSuspiciousActivity] = useState(0);
 
+  const { confirm, ConfirmDialog } = useConfirm();
   const router = useRouter();
 
   // Fetch questions from backend
@@ -313,10 +315,8 @@ useEffect(() => {
     if (isSubmitting) return;
 
     // ✅ confirmation before submitting
-    const confirmSubmit = window.confirm(
-      'Are you sure you want to submit the exam? You will not be able to change your answers after submitting.',
-    );
-    if (!confirmSubmit) return;
+     const ok = await confirm();
+    if (!ok) return;
 
     setIsSubmitting(true);
 
@@ -711,6 +711,7 @@ useEffect(() => {
           </div>
         </div>
       </div>
+      <ConfirmDialog />
     </div>
   );
 }
