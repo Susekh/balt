@@ -15,7 +15,7 @@ type Props = {
 };
 
 export default function MediaAccess({ userData }: Props) {
-  const [cameraActive, setCameraActive] = useState(false);
+  // const [cameraActive, setCameraActive] = useState(false);
   const [error, setError] = useState<string>('');
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -32,7 +32,7 @@ export default function MediaAccess({ userData }: Props) {
   };
 
   const handleUserMedia = () => {
-    setCameraActive(true);
+    // setCameraActive(true);
     setError('');
   };
 
@@ -64,7 +64,6 @@ export default function MediaAccess({ userData }: Props) {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white shadow-lg rounded-lg max-w-5xl w-full p-6 flex flex-col md:flex-row gap-8">
-        
         {/* Video Section */}
         <div className="flex-shrink-0">
           <div className="w-72 h-96 bg-black rounded overflow-hidden border-4 border-blue-600">
@@ -88,7 +87,10 @@ export default function MediaAccess({ userData }: Props) {
 
             <div className="mt-4 space-y-2 text-center md:text-left">
               <p>
-                Welcome, <span className="font-semibold">{userData.name || 'Student'}</span>
+                Welcome,{' '}
+                <span className="font-semibold">
+                  {userData.name || 'Student'}
+                </span>
               </p>
               <p>Email: {userData.email}</p>
               <p>Branch: {userData.branch || 'N/A'}</p>
@@ -99,29 +101,31 @@ export default function MediaAccess({ userData }: Props) {
                 This exam requires continuous monitoring through your camera.
               </p>
               <p className="text-sm text-gray-500">
-                Please ensure that you are seated in a well-lit environment and remain focused throughout the test.
+                Please ensure that you are seated in a well-lit environment and
+                remain focused throughout the test.
               </p>
               {error && (
-                <div className="text-red-600 text-sm font-medium">⚠ {error}</div>
+                <div className="text-red-600 text-sm font-medium">
+                  ⚠ {error}
+                </div>
               )}
             </div>
           </div>
 
           <div className="text-center md:text-left">
             <button
-              disabled={!cameraActive || !mounted}
+              disabled={!mounted} // ✅ Only check if router is mounted
               onClick={handleOnSubmit}
               className={`px-6 py-3 rounded-lg font-semibold text-white transition ${
-                cameraActive
+                mounted
                   ? 'bg-blue-600 hover:bg-blue-700'
                   : 'bg-gray-400 cursor-not-allowed'
               }`}
             >
-              {cameraActive ? 'Start Exam' : 'Waiting for permissions...'}
+              Start Exam
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );
