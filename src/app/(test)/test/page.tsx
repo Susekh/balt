@@ -40,6 +40,7 @@ export default function ProctoredExamComponent() {
   const [currentSubQuestionIndex, setCurrentSubQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState(3600);
+  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
   const [windowFocused, setWindowFocused] = useState(true);
   const [focusWarnings, setFocusWarnings] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -100,9 +101,16 @@ export default function ProctoredExamComponent() {
   const totalQuestions = allSubQuestions.length;
 
   // Timer
+  // Start / resume timer
   useEffect(() => {
     if (!testStarted || submitted) return;
-    const timer = setInterval(() => {
+
+    // clear any existing interval before creating new one
+    if (timerId) {
+      clearInterval(timerId);
+    }
+
+    const id = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           handleAutoSubmit();
@@ -111,8 +119,94 @@ export default function ProctoredExamComponent() {
         return prev - 1;
       });
     }, 1000);
-    return () => clearInterval(timer);
+
+    setTimerId(id); // 🔹 save timer id in state
+
+    return () => clearInterval(id);
   }, [testStarted, submitted]);
+
+useEffect(() => {
+  interface Attempt {
+    qid: string;
+    answer: string | null;
+    section: string;
+    questionNo: number;
+    correct: boolean;
+    correctAnswer: string;
+    timeRemaining: number;
+    attemptedAt: string;
+  }
+
+  interface AttemptsResponse {
+    email: string;
+    date: string;
+    attempts: Attempt[];
+  }
+
+  const fetchUserAndAttempts = async () => {
+    try {
+      const userRes = await fetch('/api/v1/me', { credentials: 'include' });
+      if (!userRes.ok) {
+        router.replace('/');
+        return;
+      }
+
+      const userData: { user: { email: string } } = await userRes.json();
+      const email = userData.user.email;
+      if (!email) return;
+
+      const today = new Date().toISOString().split('T')[0];
+
+      const attemptsRes = await fetch(
+        `/api/v1/get-attempts?email=${encodeURIComponent(email)}&date=${today}`,
+        {
+          credentials: 'include',
+        },
+      );
+
+      if (!attemptsRes.ok) return;
+
+      const data: AttemptsResponse = await attemptsRes.json();
+
+      if (data.attempts.length > 0) {
+        const restoredAnswers: Record<string, string> = {};
+        data.attempts.forEach((attempt) => {
+          if (attempt.answer !== null) {
+            restoredAnswers[attempt.qid] = attempt.answer;
+          }
+        });
+
+        setAnswers(restoredAnswers);
+        console.log('Restored answers:', restoredAnswers);
+
+        // 🔹 Restore last timeRemaining
+        const lastAttempt = data.attempts[data.attempts.length - 1];
+        if (lastAttempt?.timeRemaining !== undefined) {
+          setTimeLeft(lastAttempt.timeRemaining);
+          console.log('⏳ Restored time left:', lastAttempt.timeRemaining);
+        }
+
+        // ⚠ Only set the starting index if user has NOT clicked yet
+        setCurrentSubQuestionIndex((prevIndex) => {
+          if (prevIndex === 0) {
+            const lastAttemptedIndex = allSubQuestions.findIndex((sq) =>
+              restoredAnswers.hasOwnProperty(sq.id),
+            );
+            return lastAttemptedIndex >= 0 ? lastAttemptedIndex : 0;
+          }
+          return prevIndex;
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching user/attempts:', err);
+    }
+  };
+
+  if (questions.length > 0) {
+    fetchUserAndAttempts();
+  }
+}, [questions, router]);
+
 
   // Proctoring listeners
   useEffect(() => {
@@ -166,10 +260,38 @@ export default function ProctoredExamComponent() {
       .padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleAnswer = (option: string) => {
-    if (!currentSubQuestion) return;
-    setAnswers((prev) => ({ ...prev, [currentSubQuestion.id]: option }));
-  };
+  const handleAnswer = async (option: string) => {
+  if (!currentSubQuestion) return;
+
+  // ✅ Save locally right away
+  setAnswers((prev) => ({ ...prev, [currentSubQuestion.id]: option }));
+
+  try {
+    const res = await fetch('/api/v1/attempt-question', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // 🔑 send cookie with auth-token
+      body: JSON.stringify({
+        qid: currentSubQuestion.id,
+        answer: option,
+        timeRemaining: timeLeft, // 🔹 capture remaining time here
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      console.error('❌ Failed to save attempt:', err.message);
+    } else {
+      const data = await res.json();
+      console.log('✅ Attempt saved with timeRemaining:', data);
+    }
+  } catch (error) {
+    console.error('⚠️ Error saving attempt:', error);
+  }
+};
+
 
   const handleNext = () => {
     if (currentSubQuestionIndex < totalQuestions - 1) {

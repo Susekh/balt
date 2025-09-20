@@ -18,11 +18,13 @@ interface Result {
   branch: string;
   collegeName: string;
   contactNo: string;
-  sectionScores: SectionScores;
-  totalScore: number;
-  finalScore: number;
-  finalMarks: number;
+  sectionScores?: SectionScores;
+  attemptedPerSection?: SectionScores;
+  totalScore?: number;
+  finalScore?: number;
+  finalMarks?: number;
   submittedAt: string;
+  totalAttempted?: number;
 }
 
 interface ApiResponse {
@@ -49,6 +51,8 @@ export default function AdminResultsDashboard() {
         throw new Error(errData.message || 'Failed to fetch results');
       }
       const data: ApiResponse = await res.json();
+      console.log("result data ::", data);
+      
       setResults(data.data || []);
       setFilteredResults(data.data || []);
     } catch (err: unknown) {
@@ -79,7 +83,7 @@ export default function AdminResultsDashboard() {
       if (sortKey === 'name') {
         return (a.name || '').localeCompare(b.name || '');
       } else {
-        return b.finalScore - a.finalScore;
+        return (b.finalScore ?? 0) - (a.finalScore ?? 0);
       }
     });
     setFilteredResults(sorted);
@@ -98,14 +102,19 @@ export default function AdminResultsDashboard() {
       'Contact No',
       'College Name',
       'Branch',
-      'English',
-      'Analytical Ability',
-      'Quantitative Ability',
+      'English Score',
+      'English Attempted',
+      'Analytical Score',
+      'Analytical Attempted',
+      'Quantitative Score',
+      'Quantitative Attempted',
+      'Total Attempted',
       'Final Score',
       'Final Marks',
       'Total Score',
       'Submitted At',
     ];
+
     const rows = filteredResults.map((result) => [
       result.name,
       result.regNo,
@@ -113,12 +122,16 @@ export default function AdminResultsDashboard() {
       result.contactNo,
       result.collegeName,
       result.branch,
-      result.sectionScores.English,
-      result.sectionScores['Analytical Ability'],
-      result.sectionScores['Quantitative Ability'],
-      result.finalScore,
-      result.finalMarks,
-      result.totalScore,
+      result.sectionScores?.English ?? 0,
+      result.attemptedPerSection?.English ?? 0,
+      result.sectionScores?.['Analytical Ability'] ?? 0,
+      result.attemptedPerSection?.['Analytical Ability'] ?? 0,
+      result.sectionScores?.['Quantitative Ability'] ?? 0,
+      result.attemptedPerSection?.['Quantitative Ability'] ?? 0,
+      result.totalAttempted ?? 0,
+      result.finalScore ?? 0,
+      result.finalMarks ?? 0,
+      result.totalScore ?? 0,
       new Date(result.submittedAt).toLocaleString(),
     ]);
 
@@ -140,12 +153,16 @@ export default function AdminResultsDashboard() {
         'Contact No': result.contactNo,
         'College Name': result.collegeName,
         Branch: result.branch,
-        English: result.sectionScores.English,
-        'Analytical Ability': result.sectionScores['Analytical Ability'],
-        'Quantitative Ability': result.sectionScores['Quantitative Ability'],
-        'Final Score': result.finalScore,
-        'Final Marks': result.finalMarks,
-        'Total Score': result.totalScore,
+        'English Score': result.sectionScores?.English ?? 0,
+        'English Attempted': result.attemptedPerSection?.English ?? 0,
+        'Analytical Score': result.sectionScores?.['Analytical Ability'] ?? 0,
+        'Analytical Attempted': result.attemptedPerSection?.['Analytical Ability'] ?? 0,
+        'Quantitative Score': result.sectionScores?.['Quantitative Ability'] ?? 0,
+        'Quantitative Attempted': result.attemptedPerSection?.['Quantitative Ability'] ?? 0,
+        'Total Attempted': result.totalAttempted ?? 0,
+        'Final Score': result.finalScore ?? 0,
+        'Final Marks': result.finalMarks ?? 0,
+        'Total Score': result.totalScore ?? 0,
         'Submitted At': new Date(result.submittedAt).toLocaleString(),
       }))
     );
@@ -222,7 +239,7 @@ export default function AdminResultsDashboard() {
 
       {!loading && filteredResults.length > 0 && (
         <div className="overflow-x-auto rounded border border-gray-300 shadow-md bg-white">
-          <table className="w-full min-w-[1100px] table-auto border-collapse text-gray-700 text-sm md:text-base">
+          <table className="w-full min-w-[1300px] table-auto border-collapse text-gray-700 text-sm md:text-base">
             <thead className="bg-indigo-50 text-gray-600">
               <tr>
                 <th className="border px-4 py-2">Name</th>
@@ -231,9 +248,13 @@ export default function AdminResultsDashboard() {
                 <th className="border px-4 py-2">Contact No</th>
                 <th className="border px-4 py-2">College Name</th>
                 <th className="border px-4 py-2">Branch</th>
-                <th className="border px-4 py-2">English</th>
-                <th className="border px-4 py-2">Analytical</th>
-                <th className="border px-4 py-2">Quantitative</th>
+                <th className="border px-4 py-2">English Score</th>
+                <th className="border px-4 py-2">English Attempted</th>
+                <th className="border px-4 py-2">Analytical Score</th>
+                <th className="border px-4 py-2">Analytical Attempted</th>
+                <th className="border px-4 py-2">Quantitative Score</th>
+                <th className="border px-4 py-2">Quantitative Attempted</th>
+                <th className="border px-4 py-2">Total Attempted</th>
                 <th className="border px-4 py-2">Final Score</th>
                 <th className="border px-4 py-2">Final Marks</th>
                 <th className="border px-4 py-2">Total Score</th>
@@ -249,15 +270,17 @@ export default function AdminResultsDashboard() {
                   <td className="border px-4 py-2">{result.contactNo}</td>
                   <td className="border px-4 py-2">{result.collegeName}</td>
                   <td className="border px-4 py-2">{result.branch}</td>
-                  <td className="border px-4 py-2">{result.sectionScores.English}</td>
-                  <td className="border px-4 py-2">{result.sectionScores['Analytical Ability']}</td>
-                  <td className="border px-4 py-2">{result.sectionScores['Quantitative Ability']}</td>
-                  <td className="border px-4 py-2">{result.finalScore}</td>
-                  <td className="border px-4 py-2">{result.finalMarks}</td>
-                  <td className="border px-4 py-2">{result.totalScore}</td>
-                  <td className="border px-4 py-2">
-                    {new Date(result.submittedAt).toLocaleString()}
-                  </td>
+                  <td className="border px-4 py-2">{result.sectionScores?.English ?? 0}</td>
+                  <td className="border px-4 py-2">{result.attemptedPerSection?.English ?? 0}</td>
+                  <td className="border px-4 py-2">{result.sectionScores?.['Analytical Ability'] ?? 0}</td>
+                  <td className="border px-4 py-2">{result.attemptedPerSection?.['Analytical Ability'] ?? 0}</td>
+                  <td className="border px-4 py-2">{result.sectionScores?.['Quantitative Ability'] ?? 0}</td>
+                  <td className="border px-4 py-2">{result.attemptedPerSection?.['Quantitative Ability'] ?? 0}</td>
+                  <td className="border px-4 py-2">{result.totalAttempted ?? 0}</td>
+                  <td className="border px-4 py-2">{result.finalScore ?? 0}</td>
+                  <td className="border px-4 py-2">{result.finalMarks ?? 0}</td>
+                  <td className="border px-4 py-2">{result.totalScore ?? 0}</td>
+                  <td className="border px-4 py-2">{new Date(result.submittedAt).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
