@@ -5,8 +5,67 @@ import { baselineAnswersV2 as baselineAnswers } from '@/misc/baselineQuestionsV2
 
 interface RequestBody {
   answers: Record<string, string | null>; // submitted answers
-  timeSpent : string,
-  tabSwitches : number
+  timeSpent: string;
+  tabSwitches: number;
+}
+
+interface ParsedUser {
+  name: string;
+  collegeName: string;
+  branch: string;
+  regNo?: string;
+  contactNo?: string;
+  email?: string;
+  answers?: Record<string, string | null>;
+  isFinalSubmit?: boolean;
+  [key: string]: unknown;
+}
+
+// 🔹 Helper to calculate scores
+function calculateScores(answers: Record<string, string | null>) {
+  let finalScore = 0; // Correct answers count
+  let finalMarks = 0; // Score with negative marking
+  const sectionScores: Record<string, number> = {
+    English: 0,
+    'Analytical Ability': 0,
+    'Quantitative Ability': 0,
+  };
+  const attemptedPerSection: Record<string, number> = {
+    English: 0,
+    'Analytical Ability': 0,
+    'Quantitative Ability': 0,
+  };
+  let totalAttempted = 0;
+
+  const sectionMap: Record<string, string> = {
+    e: 'English',
+    a: 'Analytical Ability',
+    q: 'Quantitative Ability',
+  };
+
+  for (const qid in answers) {
+    const submitted = answers[qid];
+    if (submitted !== null) {
+      totalAttempted++;
+      const prefix = qid.charAt(0) as keyof typeof sectionMap;
+      const section = sectionMap[prefix];
+      if (section) {
+        attemptedPerSection[section]++;
+      }
+
+      if (submitted === baselineAnswers[qid]) {
+        finalScore++;
+        finalMarks++;
+        if (section) {
+          sectionScores[section]++;
+        }
+      } else {
+        finalMarks -= 0.25;
+      }
+    }
+  }
+
+  return { finalScore, finalMarks, sectionScores, attemptedPerSection, totalAttempted };
 }
 
 export async function POST(request: NextRequest) {
@@ -35,76 +94,43 @@ export async function POST(request: NextRequest) {
     const body: RequestBody = await request.json();
     const { answers, timeSpent, tabSwitches } = body;
 
+    // Guard: empty answers
+    if (!answers || Object.keys(answers).length === 0) {
+      return NextResponse.json({ message: 'No answers submitted' }, { status: 400 });
+    };
+
     // 🔹 Fetch user from Redis
     const userData = await redis.get(`student:${id}`);
     if (!userData) {
       return NextResponse.json({ message: 'No user found' }, { status: 404 });
     }
-    const parsedUser = JSON.parse(userData) as {
-      name: string;
-      collegeName: string;
-      branch: string;
-      regNo?: string;
-      contactNo?: string;
-      answers?: Record<string, string | null>;
-      [key: string]: unknown;
-    };
+    const parsedUser = JSON.parse(userData) as ParsedUser;
 
-    // 🔹 Initialize scoring
-    let finalScore = 0; // Correct answers count
-    let finalMarks = 0; // Score with negative marking
-    const sectionScores: Record<string, number> = {
-      English: 0,
-      'Analytical Ability': 0,
-      'Quantitative Ability': 0,
-    };
-    const attemptedPerSection: Record<string, number> = {
-      English: 0,
-      'Analytical Ability': 0,
-      'Quantitative Ability': 0,
-    };
-    let totalAttempted = 0;
-
-    const sectionMap: Record<string, string> = {
-      e: 'English',
-      a: 'Analytical Ability',
-      q: 'Quantitative Ability',
-    };
-
-    for (const qid in answers) {
-      const submitted = answers[qid];
-      if (submitted !== null) {
-        totalAttempted++; // Count this as attempted
-        const prefix = qid.charAt(0) as keyof typeof sectionMap;
-        const section = sectionMap[prefix];
-        if (section) {
-          attemptedPerSection[section]++; // Increment section-specific attempt count
-        }
-
-        if (submitted === baselineAnswers[qid]) {
-          finalScore++;
-          finalMarks++;
-          if (section) {
-            sectionScores[section]++;
-          }
-        } else {
-          finalMarks -= 0.25;
-        }
-      }
+    // 🔹 Prevent double submission
+    if (parsedUser.isFinalSubmit) {
+      return NextResponse.json({ message: 'Already submitted' }, { status: 403 });
     }
 
-    const totalScore = 52;
+    // 🔹 Merge old + new answers
+    const mergedAnswers = { ...(parsedUser.answers || {}), ...answers };
+
+    // 🔹 Calculate scores
+    const { finalScore, finalMarks, sectionScores, attemptedPerSection, totalAttempted } =
+      calculateScores(mergedAnswers);
+
+    const totalScore = 52; // Max score
     const submittedAt = new Date().toISOString();
 
     // 🔹 Update user data
     const updatedUserData = {
       ...parsedUser,
-      answers,
+      answers: mergedAnswers,
       isFinalSubmit: true,
       sectionScores,
       totalScore,
       timeSpent,
       finalScore,
+      finalMarks,
       totalAttempted,
       attemptedPerSection,
       submittedAt,

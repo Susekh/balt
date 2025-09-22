@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Clock, AlertTriangle, CheckCircle, Eye } from 'lucide-react';
+import { Clock, AlertTriangle, CheckCircle, Eye, WifiOff } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useConfirm } from '@/app/(admin)/components/dialog/confirm-dialog';
@@ -41,12 +41,16 @@ export default function ProctoredExamComponent() {
   const [currentSubQuestionIndex, setCurrentSubQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState(3600);
-  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
+  // const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
   const [windowFocused, setWindowFocused] = useState(true);
   const [focusWarnings, setFocusWarnings] = useState(0);
+  const [reviewQuestions, setReviewQuestions] = useState<
+    Record<string, boolean>
+  >({});
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
 
   // Proctoring states
   const [tabSwitches, setTabSwitches] = useState(0);
@@ -86,6 +90,19 @@ export default function ProctoredExamComponent() {
     fetchQuestions();
   }, [router]);
 
+  // Toggle review status
+  const handleToggleReview = (qid: string) => {
+    setReviewQuestions((prev) => {
+      const updated = { ...prev };
+      if (updated[qid]) {
+        delete updated[qid]; // unmark
+      } else {
+        updated[qid] = true; // mark
+      }
+      return updated;
+    });
+  };
+
   // Flatten all subquestions for navigation
   const allSubQuestions =
     questions.flatMap((section) =>
@@ -102,113 +119,134 @@ export default function ProctoredExamComponent() {
   const currentSubQuestion = allSubQuestions[currentSubQuestionIndex];
   const totalQuestions = allSubQuestions.length;
 
-  // Timer
-  // Start / resume timer
-  useEffect(() => {
-    if (!testStarted || submitted) return;
-
-    // clear any existing interval before creating new one
-    if (timerId) {
-      clearInterval(timerId);
-    }
-
-    const id = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          handleAutoSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    setTimerId(id); // 🔹 save timer id in state
-
-    return () => clearInterval(id);
-  }, [testStarted, submitted]);
-
+  // 🔹 Internet connectivity detection
 useEffect(() => {
-  interface Attempt {
-    qid: string;
-    answer: string | null;
-    section: string;
-    questionNo: number;
-    correct: boolean;
-    correctAnswer: string;
-    timeRemaining: number;
-    attemptedAt: string;
-  }
-
-  interface AttemptsResponse {
-    email: string;
-    date: string;
-    attempts: Attempt[];
-  }
-
-  const fetchUserAndAttempts = async () => {
+  const checkOnlineStatus = async () => {
     try {
-      const userRes = await fetch('/api/v1/me', { credentials: 'include' });
-      if (!userRes.ok) {
-        router.replace('/');
-        return;
+      // Hit a lightweight public API
+      const res = await fetch('https://jsonplaceholder.typicode.com/posts/1', {
+        cache: 'no-store',
+      });
+      if (res.ok) {
+        setIsOnline(true);
+      } else {
+        setIsOnline(false);
       }
-
-      const userData: { user: { email: string } } = await userRes.json();
-      const email = userData.user.email;
-      if (!email) return;
-
-      const today = new Date().toISOString().split('T')[0];
-
-      const attemptsRes = await fetch(
-        `/api/v1/get-attempts?email=${encodeURIComponent(email)}&date=${today}`,
-        {
-          credentials: 'include',
-        },
-      );
-
-      if (!attemptsRes.ok) return;
-
-      const data: AttemptsResponse = await attemptsRes.json();
-
-      if (data.attempts.length > 0) {
-        const restoredAnswers: Record<string, string> = {};
-        data.attempts.forEach((attempt) => {
-          if (attempt.answer !== null) {
-            restoredAnswers[attempt.qid] = attempt.answer;
-          }
-        });
-
-        setAnswers(restoredAnswers);
-        console.log('Restored answers:', restoredAnswers);
-
-        // 🔹 Restore last timeRemaining
-        const lastAttempt = data.attempts[data.attempts.length - 1];
-        if (lastAttempt?.timeRemaining !== undefined) {
-          setTimeLeft(lastAttempt.timeRemaining);
-          console.log('⏳ Restored time left:', lastAttempt.timeRemaining);
-        }
-
-        // ⚠ Only set the starting index if user has NOT clicked yet
-        setCurrentSubQuestionIndex((prevIndex) => {
-          if (prevIndex === 0) {
-            const lastAttemptedIndex = allSubQuestions.findIndex((sq) =>
-              restoredAnswers.hasOwnProperty(sq.id),
-            );
-            return lastAttemptedIndex >= 0 ? lastAttemptedIndex : 0;
-          }
-          return prevIndex;
-        });
-      }
-    } catch (err) {
-      console.error('Error fetching user/attempts:', err);
+    } catch {
+      setIsOnline(false);
     }
   };
 
-  if (questions.length > 0) {
-    fetchUserAndAttempts();
-  }
-}, [questions, router]);
+  // Initial check
+  checkOnlineStatus();
 
+  // Check every 7 seconds
+  const intervalId = setInterval(checkOnlineStatus, 7000);
+
+  return () => clearInterval(intervalId);
+}, []);
+
+
+  // Timer
+  // Start / resume timer
+  // Timer decrement
+  useEffect(() => {
+    if (!testStarted || submitted) return;
+
+    const id = setInterval(
+      () => setTimeLeft((prev) => Math.max(prev - 1, 0)),
+      1000,
+    );
+    return () => clearInterval(id);
+  }, [testStarted, submitted]);
+
+  useEffect(() => {
+    if (timeLeft <= 0 && !submitted) {
+      handleAutoSubmit();
+    }
+  }, [timeLeft, submitted]);
+
+  useEffect(() => {
+    interface Attempt {
+      qid: string;
+      answer: string | null;
+      section: string;
+      questionNo: number;
+      correct: boolean;
+      correctAnswer: string;
+      timeRemaining: number;
+      attemptedAt: string;
+    }
+
+    interface AttemptsResponse {
+      email: string;
+      date: string;
+      attempts: Attempt[];
+    }
+
+    const fetchUserAndAttempts = async () => {
+      try {
+        const userRes = await fetch('/api/v1/me', { credentials: 'include' });
+        if (!userRes.ok) {
+          router.replace('/');
+          return;
+        }
+
+        const userData: { user: { email: string } } = await userRes.json();
+        const email = userData.user.email;
+        if (!email) return;
+
+        const today = new Date().toISOString().split('T')[0];
+
+        const attemptsRes = await fetch(
+          `/api/v1/get-attempts?email=${encodeURIComponent(email)}&date=${today}`,
+          {
+            credentials: 'include',
+          },
+        );
+
+        if (!attemptsRes.ok) return;
+
+        const data: AttemptsResponse = await attemptsRes.json();
+
+        if (data.attempts.length > 0) {
+          const restoredAnswers: Record<string, string> = {};
+          data.attempts.forEach((attempt) => {
+            if (attempt.answer !== null) {
+              restoredAnswers[attempt.qid] = attempt.answer;
+            }
+          });
+
+          setAnswers(restoredAnswers);
+          console.log('Restored answers:', restoredAnswers);
+
+          // 🔹 Restore last timeRemaining
+          const lastAttempt = data.attempts[data.attempts.length - 1];
+          if (lastAttempt?.timeRemaining !== undefined) {
+            setTimeLeft(lastAttempt.timeRemaining);
+            console.log('⏳ Restored time left:', lastAttempt.timeRemaining);
+          }
+
+          // ⚠ Only set the starting index if user has NOT clicked yet
+          setCurrentSubQuestionIndex((prevIndex) => {
+            if (prevIndex === 0) {
+              const lastAttemptedIndex = allSubQuestions.findIndex((sq) =>
+                restoredAnswers.hasOwnProperty(sq.id),
+              );
+              return lastAttemptedIndex >= 0 ? lastAttemptedIndex : 0;
+            }
+            return prevIndex;
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching user/attempts:', err);
+      }
+    };
+
+    if (questions.length > 0) {
+      fetchUserAndAttempts();
+    }
+  }, [questions, router]);
 
   // Proctoring listeners
   useEffect(() => {
@@ -263,37 +301,51 @@ useEffect(() => {
   };
 
   const handleAnswer = async (option: string) => {
-  if (!currentSubQuestion) return;
+    if (!currentSubQuestion) return;
 
-  // ✅ Save locally right away
-  setAnswers((prev) => ({ ...prev, [currentSubQuestion.id]: option }));
+    // ✅ If same option is clicked again → deselect
+    const isSameSelection = answers[currentSubQuestion.id] === option;
+    const newAnswer = isSameSelection ? undefined : option;
 
-  try {
-    const res = await fetch('/api/v1/attempt-question', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include', // 🔑 send cookie with auth-token
-      body: JSON.stringify({
-        qid: currentSubQuestion.id,
-        answer: option,
-        timeRemaining: timeLeft, // 🔹 capture remaining time here
-      }),
+    // ✅ Update local state
+    setAnswers((prev) => {
+      const updated = { ...prev };
+      if (newAnswer) {
+        updated[currentSubQuestion.id] = newAnswer;
+      } else {
+        delete updated[currentSubQuestion.id];
+      }
+      return updated;
     });
 
-    if (!res.ok) {
-      const err = await res.json();
-      console.error('❌ Failed to save attempt:', err.message);
-    } else {
-      const data = await res.json();
-      console.log('✅ Attempt saved with timeRemaining:', data);
-    }
-  } catch (error) {
-    console.error('⚠️ Error saving attempt:', error);
-  }
-};
+    try {
+      const res = await fetch('/api/v1/attempt-question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          qid: currentSubQuestion.id,
+          answer: newAnswer ?? null, // send null if deselected
+          timeRemaining: timeLeft,
+        }),
+      });
 
+      if (!res.ok) {
+        const err = await res.json();
+        console.error('❌ Failed to save attempt:', err.message);
+      } else {
+        const data = await res.json();
+        console.log(
+          `✅ Attempt saved (${newAnswer ? 'answered' : 'cleared'}) with timeRemaining:`,
+          data,
+        );
+      }
+    } catch (error) {
+      console.error('⚠️ Error saving attempt:', error);
+    }
+  };
 
   const handleNext = () => {
     if (currentSubQuestionIndex < totalQuestions - 1) {
@@ -314,8 +366,13 @@ useEffect(() => {
   const handleSubmit = async () => {
     if (isSubmitting) return;
 
-    // ✅ confirmation before submitting
-     const ok = await confirm();
+    let ok = true;
+
+    // ✅ Only show confirm dialog if time is left
+    if (timeLeft > 1) {
+      ok = await confirm();
+    }
+
     if (!ok) return;
 
     setIsSubmitting(true);
@@ -337,7 +394,7 @@ useEffect(() => {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // 🔑 important so cookie (auth-token) is sent
+        credentials: 'include',
         body: JSON.stringify(examData),
       });
 
@@ -502,6 +559,13 @@ useEffect(() => {
               <Clock className="w-4 h-4" />
               {formatTime(timeLeft)}
             </div>
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="px-4 py-1 bg-green-700 text-white rounded hover:bg-green-700 disabled:opacity-50"
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Exam'}
+            </button>
           </div>
         </div>
       </div>
@@ -518,6 +582,23 @@ useEffect(() => {
           </div>
         </div>
       )}
+
+      {
+        // 🔹 Show error overlay when offline
+        !isOnline && (
+          <div className="minflex items-center justify-center">
+            <div className="bg-red-50 border rounded border-red-800 p-2 mb-3 max-w-6xl mx-auto">
+          <div className="flex items-center gap-2 text-red-800">
+            <WifiOff className="w-4 h-4" />
+            <span className="text-xs">
+              you are currently offline.
+              If this persists then please refresh.
+            </span>
+          </div>
+        </div>
+          </div>
+        )
+      }
 
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-4 gap-6">
@@ -616,51 +697,101 @@ useEffect(() => {
                   </div>
 
                   <div className="space-y-3">
-                    {currentSubQuestion.options.map((option, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleAnswer(option)}
-                        className={`w-full text-left p-4 border rounded-lg transition-colors ${
-                          answers[currentSubQuestion.id] === option
-                            ? 'bg-blue-50 border-blue-500 text-blue-900'
-                            : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        <span className="font-medium mr-3">
-                          {String.fromCharCode(65 + idx)}.
-                        </span>
-                        {option}
-                      </button>
-                    ))}
+                    {currentSubQuestion.options.map((option, idx) => {
+                      const isSelected =
+                        answers[currentSubQuestion.id] === option;
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => handleAnswer(option)}
+                          className={`w-full text-left p-4 border rounded-lg transition-colors ${
+                            isSelected
+                              ? 'bg-blue-50 border-blue-500 text-blue-900'
+                              : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span className="font-medium mr-3">
+                            {String.fromCharCode(65 + idx)}.
+                          </span>
+                          {option}
+                          {isSelected && (
+                            <span className="ml-2 text-xs text-gray-500">
+                              (click again to deselect)
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
                 {/* Navigation */}
-                <div className="flex justify-between">
-                  <button
-                    onClick={handlePrevious}
-                    disabled={currentSubQuestionIndex === 0}
-                    className="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Previous
-                  </button>
-
-                  {currentSubQuestionIndex === totalQuestions - 1 ? (
+                <div className="flex justify-between items-center mt-6">
+                  {/* Left side - navigation */}
+                  <div className="flex gap-3">
                     <button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      className="px-8 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+                      onClick={handlePrevious}
+                      disabled={currentSubQuestionIndex === 0}
+                      className="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 
+                 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed 
+                 transition-colors"
                     >
-                      {isSubmitting ? 'Submitting...' : 'Submit Exam'}
+                      Previous
                     </button>
-                  ) : (
+
                     <button
                       onClick={handleNext}
-                      className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                      disabled={currentSubQuestionIndex === totalQuestions - 1}
+                      className="px-5 py-2 rounded-lg bg-blue-600 text-white 
+                 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed 
+                 transition-colors"
                     >
                       Next
                     </button>
-                  )}
+                  </div>
+
+                  {/* Right side - actions */}
+                  <div className="flex gap-3">
+                    {/* ✅ Deselect Answer */}
+                    {answers[currentSubQuestion.id] && (
+                      <button
+                        onClick={() =>
+                          handleAnswer(answers[currentSubQuestion.id])
+                        }
+                        className="px-5 py-2 rounded-lg bg-gray-500 text-white 
+                   hover:bg-gray-600 transition-colors"
+                      >
+                        Deselect
+                      </button>
+                    )}
+
+                    {/* ✅ Mark for Review */}
+                    <button
+                      onClick={() => handleToggleReview(currentSubQuestion.id)}
+                      className={`px-5 py-2 rounded-lg text-white transition-colors ${
+                        reviewQuestions[currentSubQuestion.id]
+                          ? 'bg-orange-600 hover:bg-orange-700'
+                          : 'bg-orange-500 hover:bg-orange-600'
+                      }`}
+                    >
+                      {reviewQuestions[currentSubQuestion.id]
+                        ? 'Unmark Review'
+                        : 'Mark Review'}
+                    </button>
+
+                    {/* ✅ Submit */}
+                    {currentSubQuestionIndex === totalQuestions - 1 && (
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        className="px-6 py-2 rounded-lg bg-green-600 text-white 
+                   hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed 
+                   transition-colors font-medium"
+                      >
+                        {isSubmitting ? 'Submitting...' : 'Submit'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </>
             )}
@@ -670,21 +801,26 @@ useEffect(() => {
           <div className="bg-white rounded-lg shadow-sm p-4">
             <h3 className="font-semibold mb-4">Question Navigator</h3>
             <div className="grid grid-cols-4 gap-2">
-              {allSubQuestions.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSubQuestionIndex(idx)}
-                  className={`w-8 h-8 text-xs rounded ${
-                    idx === currentSubQuestionIndex
-                      ? 'bg-blue-600 text-white'
-                      : answers[allSubQuestions[idx].id]
-                        ? 'bg-green-200 text-green-800'
-                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }`}
-                >
-                  {idx + 1}
-                </button>
-              ))}
+              {allSubQuestions.map((sq, idx) => {
+                const isCurrent = idx === currentSubQuestionIndex;
+                const isAnswered = answers[sq.id];
+                const isReview = reviewQuestions[sq.id];
+
+                let btnClass = 'bg-gray-200 text-gray-600 hover:bg-gray-300'; // default
+                if (isCurrent) btnClass = 'bg-blue-600 text-white';
+                else if (isReview) btnClass = 'bg-orange-400 text-white';
+                else if (isAnswered) btnClass = 'bg-green-200 text-green-800';
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentSubQuestionIndex(idx)}
+                    className={`w-8 h-8 text-xs rounded ${btnClass}`}
+                  >
+                    {idx + 1}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="mt-4 text-xs">
@@ -695,6 +831,10 @@ useEffect(() => {
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-3 h-3 bg-blue-600 rounded"></div>
                 <span>Current</span>
+              </div>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-3 h-3 bg-orange-400 rounded"></div>
+                <span>Marked for Review</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-gray-200 rounded"></div>
@@ -711,7 +851,7 @@ useEffect(() => {
           </div>
         </div>
       </div>
-      <ConfirmDialog />
+      {timeLeft > 1 && <ConfirmDialog />}
     </div>
   );
 }
