@@ -36,6 +36,17 @@ const generateJWT = async (payload: JWTPayload) => {
     .sign(jwk);
 };
 
+// Helper to check if two dates are on the same day
+const isSameDay = (date1: string, date2: string) => {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  return (
+    d1.getUTCFullYear() === d2.getUTCFullYear() &&
+    d1.getUTCMonth() === d2.getUTCMonth() &&
+    d1.getUTCDate() === d2.getUTCDate()
+  );
+};
+
 export async function POST(request: NextRequest) {
   try {
     const body: RequestBody = await request.json();
@@ -58,13 +69,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // MUST BE REMOVED LATER
-    //temporary admin login logic to view result
-
+    // ✅ Admin logic (no restrictions)
     if (sanitizedEmail === 'sumant12345@gmail.com') {
       const jwt = await generateJWT({
         id: sanitizedEmail,
-        role: 'admin'
+        role: 'admin',
       });
 
       const response = NextResponse.json(
@@ -82,14 +91,27 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
+    // ✅ Student logic
     const existingData = await redis.get(`student:${sanitizedEmail}`);
+    const today = new Date().toISOString();
     let userData;
 
     if (existingData) {
-      // User exists – reuse data
       userData = JSON.parse(existingData);
+
+      if (userData.lastLogin && isSameDay(userData.lastLogin, today)) {
+        // 🚫 Already logged in today
+        return NextResponse.json(
+          { message: 'You can only login once per day.' },
+          { status: 403 },
+        );
+      }
+
+      // ✅ Update lastLogin to today
+      userData.lastLogin = today;
+      await redis.set(`student:${sanitizedEmail}`, JSON.stringify(userData));
     } else {
-      // New user – create and store
+      // 🆕 New user – create record
       userData = {
         uid: randomUUID(),
         email: sanitizedEmail,
@@ -100,13 +122,14 @@ export async function POST(request: NextRequest) {
         semester: null,
         isFinalSubmit: false,
         score: null,
-        createdAt: new Date().toISOString(),
+        createdAt: today,
+        lastLogin: today,
       };
 
       await redis.set(`student:${sanitizedEmail}`, JSON.stringify(userData));
     }
 
-    // Generate JWT
+    // ✅ Generate JWT
     const jwt = await generateJWT({
       id: userData.email,
     });
@@ -123,7 +146,6 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
-      // secure: false,
       path: '/',
     });
 

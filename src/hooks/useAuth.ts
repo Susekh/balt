@@ -25,7 +25,7 @@ export function useAuth() {
       console.log("res ::", response.status);
       
       if(response.status === 210) {
-        router.replace("/admin/results");
+        router.replace("/admin/reports");
       }
 
       if (response.status === 400) {

@@ -7,7 +7,7 @@ interface AttemptBody {
   qid: string;
   answer: string | null;
   timeRemaining: number;
-}
+};
 
 // 🔹 Section mapping
 const sectionMap: Record<string, string> = {
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     const tokenData = await tokenValidation(token);
     if (!tokenData?.success || !tokenData.payload?.id) {
       return NextResponse.redirect(new URL("/", request.url));
-    }
+    };
 
     // @ts-expect-error id exists
     const id: string = tokenData.payload.id;
