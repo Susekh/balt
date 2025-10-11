@@ -7,7 +7,7 @@ interface RequestBody {
   fullName: string;
   phone: string;
   email: string;
-  regNo : string;
+  regNo: string;
   branch: string;
 }
 
@@ -38,6 +38,21 @@ const generateJWT = async (payload: JWTPayload) => {
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('3h')
     .sign(jwk);
+};
+
+// Convert UTC date to IST date string (yyyy-mm-dd)
+const toISTDateString = (date: Date) => {
+  const utcMillis = date.getTime();
+  const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in ms
+  const istDate = new Date(utcMillis + istOffset);
+  return istDate.toISOString().split('T')[0]; // yyyy-mm-dd only
+};
+
+// Compare if two timestamps are on same IST day
+const isSameISTDay = (date1: string, date2: string) => {
+  const d1IST = toISTDateString(new Date(date1));
+  const d2IST = toISTDateString(new Date(date2));
+  return d1IST === d2IST;
 };
 
 export async function POST(request: NextRequest) {
@@ -94,37 +109,65 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // Check if the user already exists
     const existingData = await redis.get(`student:${sanitizedEmail}`);
+    const now = new Date();
+    const currentLoginTime = now.toISOString();
     let userData;
-    const currentLoginTime = new Date().toISOString();
 
     if (existingData) {
-      // User exists – reuse their data
       userData = JSON.parse(existingData);
+
+      if (userData.lastLogin) {
+        const sameISTDay = isSameISTDay(userData.lastLogin, currentLoginTime);
+
+        if (userData.isFinalSubmit && !sameISTDay) {
+          // Different IST day → reset submission
+          userData.isFinalSubmit = false;
+        }
+      } else {
+        // No lastLogin recorded yet
+        userData.lastLogin = currentLoginTime;
+      }
     } else {
-      // Create new user
+      // New user
       userData = {
         uid: randomUUID(),
         email: sanitizedEmail,
         name: fullName.trim(),
         branch: branch.trim(),
         contactNo: phone.trim(),
-        regNo : regNo.trim(),
+        regNo: regNo.trim(),
         collegeName: 'Trident Academy of Technology',
         semester: '7th',
-        type : "baseline",
-        lastLogin : currentLoginTime,
-        totalScore : 52,
+        type: 'baseline',
+        lastLogin: currentLoginTime,
+        totalScore: 52,
         isFinalSubmit: false,
         score: null,
         createdAt: new Date().toISOString(),
       };
-
-      userData.lastLogin = currentLoginTime;
-
-      await redis.set(`student:${sanitizedEmail}`, JSON.stringify(userData));
     }
+
+    // Final submit check (IST)
+    const sameISTDay = userData.lastLogin
+      ? isSameISTDay(userData.lastLogin, currentLoginTime)
+      : false;
+
+    if (userData.isFinalSubmit && sameISTDay) {
+      return NextResponse.json(
+        {
+          message:
+            'You have already submitted the exam today and cannot log in again.',
+        },
+        { status: 403 },
+      );
+    }
+
+    // Update login timestamp
+    userData.lastLogin = currentLoginTime;
+   
+    
+    await redis.set(`student:${sanitizedEmail}`, JSON.stringify(userData));
 
     // Generate JWT
     const jwt = await generateJWT({
@@ -140,18 +183,8 @@ export async function POST(request: NextRequest) {
           branch: userData.branch,
         },
       },
-      { status: existingData ? 200 : 201 }, // 200 if existing, 201 if new
+      { status: existingData ? 200 : 201 },
     );
-
-    if (userData.isFinalSubmit) {
-      return NextResponse.json(
-        {
-          message:
-            'You have already submitted the exam and cannot log in again.',
-        },
-        { status: 403 },
-      );
-    }
 
     response.cookies.set('auth-token', jwt, {
       httpOnly: true,
