@@ -102,6 +102,9 @@ export async function GET(request: NextRequest) {
 
       const parsedAttempts: Attempt[] = attemptsData.map((a) => JSON.parse(a));
 
+      console.log("parsed attempts : :", parsedAttempts);
+      
+
       // Section-wise aggregation
       const sectionMap: Record<string, SectionReport> = {};
       parsedAttempts.forEach((a) => {

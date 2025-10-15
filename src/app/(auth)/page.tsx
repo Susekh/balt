@@ -8,7 +8,7 @@ export default function Login() {
   const { isLoading, error, register } = useAuth();
 
   return (
-    <div className="w-1/4 mx-auto mt-8">
+    <div className="md:w-1/4 mx-auto mt-8">
       <LoginForm onSubmit={register} error={error} isLoading={isLoading} />
     </div>
   );

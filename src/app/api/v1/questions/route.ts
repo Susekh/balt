@@ -1,5 +1,5 @@
 // app/api/questions/route.ts
-import { baselineQuestionsV2 } from '@/misc/baselineQuestionsV2';
+import { baselineQuestionsV3 } from '@/misc/baselineQuestionsV3';
 import { NextResponse, NextRequest } from 'next/server';
 import { redis } from '@/lib/redis';
 import { tokenValidation } from '../../../../../services/token-validation-service';
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 🔹 Return the baseline questions
-    return NextResponse.json(baselineQuestionsV2);
+    return NextResponse.json(baselineQuestionsV3);
   } catch (err) {
     console.error('::api/questions::', err);
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });

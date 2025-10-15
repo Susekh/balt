@@ -72,6 +72,9 @@ export default function ReportsPage() {
     new Set(reports.flatMap((r) => r.sectionReports.map((s) => s.section)))
   );
 
+  console.log("All sections  + Reports", allSections, reports);
+  
+
   const formatDate = (isoDate: string | null) =>
     isoDate
       ? new Date(isoDate).toLocaleString('en-GB', {
