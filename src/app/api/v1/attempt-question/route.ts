@@ -104,8 +104,6 @@ export async function POST(request: NextRequest) {
       timeRemaining,
       attemptedAt: new Date().toISOString(),
     };
-
-    console.log("attempt ::", attempt);
     
     // 🔹 Save/update separately by email + date
     const dateKey = new Date().toISOString().split('T')[0];
