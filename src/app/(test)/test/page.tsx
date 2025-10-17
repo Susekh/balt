@@ -257,12 +257,12 @@ useEffect(() => {
       setFocusWarnings((prev) => prev + 1);
       setSuspiciousActivity((prev) => prev + 1);
     };
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setTabSwitches((prev) => prev + 1);
-        setSuspiciousActivity((prev) => prev + 1);
-      }
-    };
+    // const handleVisibilityChange = () => {
+    //   if (document.hidden) {
+    //     setTabSwitches((prev) => prev + 1);
+    //     setSuspiciousActivity((prev) => prev + 1);
+    //   }
+    // };
     const handleContextMenu = (e: Event) => {
       e.preventDefault();
       setSuspiciousActivity((prev) => prev + 1);
@@ -279,13 +279,13 @@ useEffect(() => {
     };
     window.addEventListener('focus', handleFocus);
     window.addEventListener('blur', handleBlur);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // document.addEventListener('visibilitychange', handleVisibilityChange);
     document.addEventListener('contextmenu', handleContextMenu);
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('blur', handleBlur);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      // document.removeEventListener('visibilitychange', handleVisibilityChange);
       document.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('keydown', handleKeyDown);
     };
@@ -481,7 +481,7 @@ useEffect(() => {
             <p>Total Questions: {totalQuestions}</p>
             <p>Answered: {Object.keys(answers).length}</p>
             <p>Time Spent: {formatTime(3600 - timeLeft)}</p>
-            <p>Tab Switches: {tabSwitches}</p>
+            <p>Tab Switches: {tabSwitches - 1}</p>
           </div>
         </div>
       </div>
@@ -520,9 +520,9 @@ useEffect(() => {
               Test Structure:
             </h3>
             <ul className="text-blue-700 space-y-1">
-              <li>• English </li>
-              <li>• Analytical ability</li>
-              <li>• Quantitative </li>
+              <li>• Verbal Ability </li>
+              <li>• Analytical Ability</li>
+              <li>• General Mental Ability </li>
             </ul>
           </div>
 

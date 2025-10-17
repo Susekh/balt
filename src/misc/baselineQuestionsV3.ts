@@ -825,7 +825,7 @@ export const baselineAnswersV3: Record<string, string>= {
   "s3-6-1": "To the east of the blue tile",
   "s3-6-2": "The red tile",
   "s3-6-3": "The orange tile is between the red and the black tiles.",
-  "s3-6-4": "The orange tile is to the left of the pink tile..",
+  "s3-6-4": "The orange tile is to the left of the pink tile.",
   "s3-7-1": "RMRJY",
   "s3-11-1": "D",
   "s3-12-1": "C",

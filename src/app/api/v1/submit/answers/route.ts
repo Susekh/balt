@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
       branch: parsedUser.branch,
       contactNo: parsedUser.contactNo,
       sectionScores,
-      tabSwitches,
+      tabSwitches : tabSwitches - 1,
       attemptedPerSection,
       totalAttempted,
       totalScore,
