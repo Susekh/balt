@@ -1,34 +1,81 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
 
+type AttemptRecord = {
+  qid: string;
+  answer: string | null;
+  correct: boolean | null;
+  question?: string | null;
+  subQuestion?: string | null;
+  timeRemaining: number;
+  attemptedAt: string;
+};
+
+/** Safely decode JSON cookie */
+function parseJsonCookie<T>(cookieValue: string | undefined): T | null {
+  if (!cookieValue) return null;
+  try {
+    return JSON.parse(decodeURIComponent(cookieValue)) as T;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const email = searchParams.get("email");
-    const date = searchParams.get("date"); // YYYY-MM-DD
+    const cookies = request.cookies;
 
-    if (!email || !date) {
+    // Extract session, get email
+    const session = parseJsonCookie<{ email?: string }>(
+      cookies.get("user-session")?.value
+    );
+
+    const email = session?.email ?? null;
+    if (!email) {
       return NextResponse.json(
-        { message: "email and date are required" },
+        { message: "Invalid or missing user-session cookie (email not found)" },
         { status: 400 }
       );
     }
 
-    const attemptsKey = `attempts:${email}:${date}`;
-    const attempts = await redis.lrange(attemptsKey, 0, -1);
+    // Extract active test cookie
+    const parsedTest = parseJsonCookie<{ id: string; title: string }>(
+      cookies.get("active_test")?.value
+    );
 
-    if (!attempts.length) {
+    if (!parsedTest?.id) {
       return NextResponse.json(
-        { message: "No attempts found", attempts: [] },
-        { status: 404 }
+        { message: "Missing or invalid active_test cookie" },
+        { status: 400 }
       );
     }
 
-    const parsedAttempts = attempts.map((a) => JSON.parse(a));
+    const attemptsKey = `attempts:${email}:${parsedTest.id}`;
+    const attempts = await redis.lrange(attemptsKey, 0, -1);
 
-    return NextResponse.json({ email, date, attempts: parsedAttempts });
+    if (attempts.length === 0) {
+      return NextResponse.json(
+        { message: "No attempts found", attempts: [] },
+        { status: 200 }
+      );
+    }
+
+    const parsedAttempts: AttemptRecord[] = attempts.map((entry) =>
+      JSON.parse(entry) as AttemptRecord
+    );
+    console.log("attempts ::", parsedAttempts);
+    
+
+    return NextResponse.json({
+      email,
+      testId: parsedTest.id,
+      attempts: parsedAttempts,
+    });
   } catch (err) {
-    console.error("::api/get-attempts::", err);
-    return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
+    console.error(":: api/get-attempts ::", err);
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
 import { tokenValidation } from "../../../../../services/token-validation-service";
+import { questionList } from "@/misc/questionList";
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     const parsedUser = JSON.parse(userData);
-    return NextResponse.json({ success: true, user: parsedUser });
+    return NextResponse.json({ success: true, user: parsedUser, questionList });
   } catch (err) {
     console.error("::api/me::", err);
     return NextResponse.json({ message: "Something went wrong" }, { status: 500 });

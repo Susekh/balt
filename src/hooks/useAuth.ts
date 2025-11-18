@@ -52,7 +52,7 @@ export function useAuth() {
 
       if (response.status === 201 || response.status === 200) {
         // Successfully registered
-        router.replace('/welcome');
+        router.replace('/dashboard');
         return;
       }
       setError('Unexpected error occurred');

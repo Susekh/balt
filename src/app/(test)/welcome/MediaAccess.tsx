@@ -37,7 +37,7 @@ export default function MediaAccess({ userData }: Props) {
   };
 
   const handleOnSubmit = () => {
-    if (!mounted) return; // Ensure router is ready
+    if (!mounted) return;
     router.replace('/test?test=baseline');
   };
 

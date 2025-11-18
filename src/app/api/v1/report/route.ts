@@ -2,41 +2,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { redis } from '@/lib/redis';
 import { tokenValidation } from '../../../../../services/token-validation-service';
+import { questionList } from '@/misc/questionList';
 
 interface Attempt {
   qid: string;
   answer: string | null;
-  section: string;
-  questionNo: number;
-  correct: boolean;
-  correctAnswer: string;
+  correct: boolean | null;
+  correctAnswer: string | null;
+  question?: string | null;
+  subQuestion?: string | null;
   timeRemaining: number;
   attemptedAt: string;
-  regNo: string;
 }
 
-interface SectionReport {
-  section: string;
-  attemptedQuestions: number;
-  correctQuestions: number;
-  wrongQuestions: number;
-  marks: number;
+interface Sections {
+  verbal: string[];
+  analytical: string[];
+  numerical: string[];
 }
 
 interface Report {
   email: string;
   name: string;
-  branch: string;
-  date: string;
+  testId: string;
+  testTitle: string;
   totalQuestions: number;
   attemptedQuestions: number;
   correctQuestions: number;
+  regNo: string;
+  branch : string;
+  sections: Sections;
   wrongQuestions: number;
   marks: number;
-  sectionReports: SectionReport[];
   attempts: Attempt[];
-  regNo: string;
-  lastSubmittedAt: string | null;
 }
 
 export async function GET(request: NextRequest) {
@@ -44,11 +42,12 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('cookie');
     const token = authHeader
       ?.split(';')
-      .find((cookie) => cookie.trim().startsWith('auth-token='))
+      .find((cookie) => cookie.trim().startsWith('auth-token=')) 
       ?.split('=')[1];
 
-    if (!token)
+    if (!token) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
 
     const tokenData = await tokenValidation(token);
     if (
@@ -60,106 +59,100 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const date = searchParams.get('date');
-    if (!date)
+    const testId = searchParams.get('testId');
+
+    if (!testId) {
       return NextResponse.json(
-        { message: 'Date parameter is required' },
+        { message: 'testId parameter is required' },
         { status: 400 },
       );
+    }
 
-    const resultKey = `results:${date}`;
-    const results = await redis.lrange(resultKey, 0, -1);
-    if (!results.length)
+    // Get all users who attempted the test
+    const pattern = `attempts:*:${testId}`;
+    const keys = await redis.keys(pattern);
+
+    if (!keys.length) {
       return NextResponse.json(
         { message: 'No results found', data: [] },
         { status: 200 },
       );
-    let lastSubmittedAt: string | null = null;
+    }
 
-    const parsedResults = results.map((r) => JSON.parse(r));
     const reports: Report[] = [];
 
-    for (const entry of parsedResults) {
-      const email: string = entry.email;
-      lastSubmittedAt = entry.submittedAt
-        ? new Date(entry.submittedAt).toLocaleString('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false, 
-          })
-        : null;
+    for (const key of keys) {
+      const parts = key.split(':');
+      if (parts.length !== 3) continue;
 
-      const name: string = entry.name ?? 'Unknown';
-      const branch: string = entry.branch ?? 'Unknown';
+      const email = parts[1];
 
-      const attemptsKey = `attempts:${email}:${date}`;
-      const attemptsData = await redis.lrange(attemptsKey, 0, -1);
+      // Fetch user details
+      const userKey = `student:${email}`;
+      const userData = await redis.get(userKey);
+
+      let name = 'Unknown';
+      let regNo = '';
+      let branch = '';
+
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        name = parsedUser.name || parsedUser.username || 'Unknown';
+        regNo = parsedUser.regNo;
+        branch = parsedUser.branch;
+      }
+
+      // Fetch attempts
+      const attemptsData = await redis.lrange(key, 0, -1);
       if (!attemptsData.length) continue;
 
       const parsedAttempts: Attempt[] = attemptsData.map((a) => JSON.parse(a));
 
-      console.log("parsed attempts : :", parsedAttempts);
-      
+      // Calculate stats
+      const attemptedQuestions = parsedAttempts.filter((a) => a.answer !== null)
+        .length;
 
-      // Section-wise aggregation
-      const sectionMap: Record<string, SectionReport> = {};
-      parsedAttempts.forEach((a) => {
-        if (!sectionMap[a.section]) {
-          sectionMap[a.section] = {
-            section: a.section,
-            attemptedQuestions: 0,
-            correctQuestions: 0,
-            wrongQuestions: 0,
-            marks: 0,
-          };
-        }
-        const sec = sectionMap[a.section];
-        if (a.answer !== null) {
-          sec.attemptedQuestions += 1;
-          if (a.correct) sec.correctQuestions += 1;
-          else sec.wrongQuestions += 1;
-        }
-      });
+      const correctQuestions = parsedAttempts.filter((a) => a.correct === true)
+        .length;
 
-      Object.values(sectionMap).forEach((sec) => {
-        sec.marks = sec.correctQuestions * 1 - sec.wrongQuestions * 0.25;
-      });
-      const attemptedQuestions = parsedAttempts.filter(
-        (a) => a.answer !== null,
+      const wrongQuestions = parsedAttempts.filter(
+        (a) => a.answer !== null && a.correct === false,
       ).length;
-      const correctQuestions = parsedAttempts.filter((a) => a.correct).length;
-      const wrongQuestions = attemptedQuestions - correctQuestions;
+
       const marks = correctQuestions * 1 - wrongQuestions * 0.25;
 
-      const regNo = parsedAttempts[0]?.regNo ?? 'Unknown';
+      const test = questionList.find((e) => e.id === testId);
 
-      // // 🔹 Get last submitted info
-      // const lastResultKey = `student:${regNo}`;
-      // const lastResultData = await redis.get(lastResultKey);
-      // if (lastResultData) {
-      //   const parsedUser = JSON.parse(lastResultData);
-      //   if (parsedUser.isFinalSubmit) lastSubmittedAt = parsedUser.submittedAt ?? null;
-      //   console.log("user submitted at", parsedUser.submittedAt);
-      // }
+      // FIXED SECTION GROUPING
+      const sectionWise: Sections = {
+        verbal: parsedAttempts
+          .filter((a) => a.qid.startsWith('s1'))
+          .map((a) => a.qid),
 
+        analytical: parsedAttempts
+          .filter((a) => a.qid.startsWith('s2'))
+          .map((a) => a.qid),
+
+        numerical: parsedAttempts
+          .filter((a) => a.qid.startsWith('s3'))
+          .map((a) => a.qid),
+      };
+
+      // Build report entry
       reports.push({
         email,
         name,
-        branch,
-        date,
-        totalQuestions : 52,
+        testId,
+        testTitle: test?.title || "Unknown Test",
+        totalQuestions: parsedAttempts.length,
         attemptedQuestions,
+        regNo,
+        branch,
         correctQuestions,
         wrongQuestions,
         marks,
-        sectionReports: Object.values(sectionMap),
         attempts: parsedAttempts,
-        regNo,
-        lastSubmittedAt,
+        sections: sectionWise,
       });
     }
 

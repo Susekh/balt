@@ -1,9 +1,11 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Clock, AlertTriangle, CheckCircle, Eye, WifiOff } from 'lucide-react';
+import { Clock, AlertTriangle, WifiOff } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useConfirm } from '@/app/(admin)/components/dialog/confirm-dialog';
+import InstructionsScreen from '../../../../components/exam/InstructionScreen';
+import ExamSubmitted from '../../../../components/exam/ExamSubmitted';
 
 // Types
 type ContentItem = {
@@ -77,7 +79,8 @@ export default function ProctoredExamComponent() {
 
         if (!res.ok) throw new Error('Failed to fetch questions');
 
-        const data: Section[] = await res.json();
+        const response = await res.json();
+        const data : Section[] = response.questions;
         setQuestions(data);
       } catch (err: unknown) {
         if (err instanceof Error) setError(err.message);
@@ -120,32 +123,34 @@ export default function ProctoredExamComponent() {
   const totalQuestions = allSubQuestions.length;
 
   // 🔹 Internet connectivity detection
-useEffect(() => {
-  const checkOnlineStatus = async () => {
-    try {
-      // Hit a lightweight public API
-      const res = await fetch('https://jsonplaceholder.typicode.com/posts/1', {
-        cache: 'no-store',
-      });
-      if (res.ok) {
-        setIsOnline(true);
-      } else {
+  useEffect(() => {
+    const checkOnlineStatus = async () => {
+      try {
+        // Hit a lightweight public API
+        const res = await fetch(
+          'https://jsonplaceholder.typicode.com/posts/1',
+          {
+            cache: 'no-store',
+          },
+        );
+        if (res.ok) {
+          setIsOnline(true);
+        } else {
+          setIsOnline(false);
+        }
+      } catch {
         setIsOnline(false);
       }
-    } catch {
-      setIsOnline(false);
-    }
-  };
+    };
 
-  // Initial check
-  checkOnlineStatus();
+    // Initial check
+    checkOnlineStatus();
 
-  // Check every 7 seconds
-  const intervalId = setInterval(checkOnlineStatus, 7000);
+    // Check every 7 seconds
+    const intervalId = setInterval(checkOnlineStatus, 7000);
 
-  return () => clearInterval(intervalId);
-}, []);
-
+    return () => clearInterval(intervalId);
+  }, []);
 
   // Timer
   // Start / resume timer
@@ -327,6 +332,8 @@ useEffect(() => {
         credentials: 'include',
         body: JSON.stringify({
           qid: currentSubQuestion.id,
+          question: currentSubQuestion.questionContent,
+          subQuestion: currentSubQuestion.content,
           answer: newAnswer ?? null, // send null if deselected
           timeRemaining: timeLeft,
         }),
@@ -412,9 +419,6 @@ useEffect(() => {
       );
 
       setSubmitted(true);
-      setTimeout(() => {
-        router.replace('/');
-      }, 5000);
     } catch (error) {
       console.error('❌ Submission failed:', error);
       alert('Failed to submit exam. Please try again.');
@@ -468,73 +472,24 @@ useEffect(() => {
     );
   }
 
+  
+
   // Test completion screen
   if (submitted) {
     return (
-      <div className="min-h-screen bg-green-50 flex items-center justify-center p-6">
-        <div className="bg-white border-2 border-green-500 rounded-lg p-8 text-center shadow-lg max-w-md">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-green-600 mb-4">
-            Exam Submitted Successfully!
-          </h2>
-          <div className="text-gray-700 space-y-2">
-            <p>Total Questions: {totalQuestions}</p>
-            <p>Answered: {Object.keys(answers).length}</p>
-            <p>Time Spent: {formatTime(3600 - timeLeft)}</p>
-            <p>Tab Switches: {tabSwitches - 1}</p>
-          </div>
-        </div>
-      </div>
+      <ExamSubmitted
+        totalQuestions={totalQuestions}
+        answered={Object.keys(answers).length}
+        timeSpent={3600 - timeLeft}
+        tabSwitches={tabSwitches - 1}
+        onViewAnswers={() => router.push('/dashboard')}
+      />
     );
   }
 
   // Pre-test instructions
   if (!testStarted) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">
-            Exam Instructions
-          </h1>
-
-          <div className="space-y-4 mb-8">
-            <div className="flex items-start gap-3">
-              <Clock className="w-5 h-5 text-blue-600 mt-1" />
-              <p>Time limit: 60 minutes</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <Eye className="w-5 h-5 text-blue-600 mt-1" />
-              <p>
-                Keep this window in focus at all times. Tab switching is
-                monitored.
-              </p>
-            </div>
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-orange-600 mt-1" />
-              <p>Right-click and keyboard shortcuts are disabled.</p>
-            </div>
-          </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
-            <h3 className="font-semibold text-blue-800 mb-2">
-              Test Structure:
-            </h3>
-            <ul className="text-blue-700 space-y-1">
-              <li>• Verbal Ability </li>
-              <li>• Analytical Ability</li>
-              <li>• General Mental Ability </li>
-            </ul>
-          </div>
-
-          <button
-            onClick={startTest}
-            className="w-full py-3 bg-blue-600 text-white text-lg font-semibold rounded hover:bg-blue-700 transition-colors"
-          >
-            Start Exam
-          </button>
-        </div>
-      </div>
-    );
+    return <InstructionsScreen onStart={startTest} />;
   }
 
   // Main exam interface
@@ -588,14 +543,14 @@ useEffect(() => {
         !isOnline && (
           <div className="minflex items-center justify-center">
             <div className="bg-red-50 border rounded border-red-800 p-2 mb-3 max-w-6xl mx-auto">
-          <div className="flex items-center gap-2 text-red-800">
-            <WifiOff className="w-4 h-4" />
-            <span className="text-xs">
-              you are currently offline.
-              If this persists then please refresh.
-            </span>
-          </div>
-        </div>
+              <div className="flex items-center gap-2 text-red-800">
+                <WifiOff className="w-4 h-4" />
+                <span className="text-xs">
+                  you are currently offline. If this persists then please
+                  refresh.
+                </span>
+              </div>
+            </div>
           </div>
         )
       }

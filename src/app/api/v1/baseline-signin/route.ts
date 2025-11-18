@@ -40,15 +40,14 @@ const generateJWT = async (payload: JWTPayload) => {
     .sign(jwk);
 };
 
-// Convert UTC date to IST date string (yyyy-mm-dd)
+// Convert UTC date to IST (yyyy-mm-dd)
 const toISTDateString = (date: Date) => {
   const utcMillis = date.getTime();
-  const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in ms
+  const istOffset = 5.5 * 60 * 60 * 1000;
   const istDate = new Date(utcMillis + istOffset);
-  return istDate.toISOString().split('T')[0]; // yyyy-mm-dd only
+  return istDate.toISOString().split('T')[0];
 };
 
-// Compare if two timestamps are on same IST day
 const isSameISTDay = (date1: string, date2: string) => {
   const d1IST = toISTDateString(new Date(date1));
   const d2IST = toISTDateString(new Date(date2));
@@ -87,8 +86,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Admin login logic
+    // ✅ Admin login logic
     if (sanitizedEmail === 'sumant12345@gmail.com') {
+
+      const adminData = await redis.get(`student:${sanitizedEmail}`);
+
+      if (!adminData) {
+        const now = new Date().toISOString();
+
+        const adminRecord = {
+          uid: randomUUID(),
+          email: sanitizedEmail,
+          name: "Admin User",
+          branch: "ADMIN",
+          regNo: "N/A",
+          contactNo: "N/A",
+          collegeName: "Admin Control",
+          semester: "N/A",
+          type: "admin",
+          lastLogin: now,
+          totalScore: 0,
+          isFinalSubmit: false,
+          score: null,
+          createdAt: now,
+          compltedTests: []
+        };
+
+        await redis.set(`student:${sanitizedEmail}`, JSON.stringify(adminRecord));
+      }
       const jwt = await generateJWT({
         id: sanitizedEmail,
         role: 'admin',
@@ -104,7 +129,24 @@ export async function POST(request: NextRequest) {
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
         path: '/',
+        maxAge: 24 * 60 * 60,
       });
+
+      //  NEW SEPARATE COOKIE
+      response.cookies.set(
+        'user-session',
+        JSON.stringify({
+          email: sanitizedEmail,
+          loginDate: new Date().toISOString(),
+        }),
+        {
+          httpOnly: false,
+          sameSite: 'lax',
+          secure: process.env.NODE_ENV === 'production',
+          path: '/',
+          maxAge: 24 * 60 * 60,
+        },
+      );
 
       return response;
     }
@@ -121,15 +163,12 @@ export async function POST(request: NextRequest) {
         const sameISTDay = isSameISTDay(userData.lastLogin, currentLoginTime);
 
         if (userData.isFinalSubmit && !sameISTDay) {
-          // Different IST day → reset submission
           userData.isFinalSubmit = false;
         }
       } else {
-        // No lastLogin recorded yet
         userData.lastLogin = currentLoginTime;
       }
     } else {
-      // New user
       userData = {
         uid: randomUUID(),
         email: sanitizedEmail,
@@ -148,28 +187,24 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Final submit check (IST)
-    const sameISTDay = userData.lastLogin
-      ? isSameISTDay(userData.lastLogin, currentLoginTime)
-      : false;
+    // const sameISTDay = userData.lastLogin
+    //   ? isSameISTDay(userData.lastLogin, currentLoginTime)
+    //   : false;
 
-    if (userData.isFinalSubmit && sameISTDay) {
-      return NextResponse.json(
-        {
-          message:
-            'You have already submitted the exam today and cannot log in again.',
-        },
-        { status: 403 },
-      );
-    }
+    // if (userData.isFinalSubmit && sameISTDay) {
+    //   return NextResponse.json(
+    //     {
+    //       message:
+    //         'You have already submitted the exam today and cannot log in again.',
+    //     },
+    //     { status: 403 },
+    //   );
+    // }
 
-    // Update login timestamp
     userData.lastLogin = currentLoginTime;
-   
-    
+
     await redis.set(`student:${sanitizedEmail}`, JSON.stringify(userData));
 
-    // Generate JWT
     const jwt = await generateJWT({
       id: sanitizedEmail,
     });
@@ -181,6 +216,7 @@ export async function POST(request: NextRequest) {
           email: sanitizedEmail,
           fullName: userData.name,
           branch: userData.branch,
+          compltedTests : userData.compltedTests
         },
       },
       { status: existingData ? 200 : 201 },
@@ -191,7 +227,24 @@ export async function POST(request: NextRequest) {
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       path: '/',
+      maxAge: 6 * 60 * 60,
     });
+
+    // ✅ NEW SEPARATE COOKIE
+    response.cookies.set(
+      'user-session',
+      JSON.stringify({
+        email: sanitizedEmail,
+        loginDate: new Date().toISOString(),
+      }),
+      {
+        httpOnly: false,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 24 * 60 * 60,
+      },
+    );
 
     return response;
   } catch (error) {
