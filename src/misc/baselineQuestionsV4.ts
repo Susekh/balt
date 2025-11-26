@@ -1,838 +1,1242 @@
-const baselineQuestionsV3 = [
+export const baselineQuestionsV4 = [
   {
-    section: "Verbal Ability",
+    section: "Logical & Analytical Reasoning",
     questions: [
+      // Q1
       {
         id: "s1-1",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value: `Read the passage and answer the questions that follow on the basis of the information provided in the passage.
-
-Are we alone? The question has tickled the human imagination for years, perhaps ever since our earliest ancestors looked up at the night sky into the endless sea of stars. Is anyone else out there?
-
-Humans do not yet have a definitive answer to the question, but a team of astronomers running computer simulations of planet formation has found that Earth-like planets with enough water to support life could be fairly common.
-
-The team ran 44 simulations of planet formation near a sun and found that each simulation produced one to four terrestrial (rocky, Earth-like) planets, including 11 planets at about the same distance from their stars as Earth is to the sun.
-
-"It's hard to say we sampled exactly the conditions in the galaxy in which terrestrial planets form, but in the cases we chose, an Earth- like planet formed in about a quarter of the cases," said Sean Raymond, an astronomer at the University of Washington in Seattle.
-
-Raymond is the lead author of a paper on the simulations, recently accepted for publication in the astronomy journal Icarus. The co- authors are Thomas Quinn at the University of Washington and Jonathan Lunine at the University of Arizona in Tucson.
-
-The simulations show a wide variety of planets forming; everything from dry planets like Mars, to Earth-like planets, to planets three times as large as Earth with 20 times as much water.
-
-Greg Laughlin, an astronomer at the University of California, Santa Cruz, and expert on planet formation, said he agrees with the interpretation that the universe may be full of a variety of planets, including Earth-like planets with significant water to harbor life.
-
-"There is nothing in our current understanding of planet formation and planetary systems to suggest that the basic architecture of our solar system is particularly unusual", he said.`
+            value:
+              "In the word ORGANISATIONAL, if the first and second, third and fourth, fourth and fifth, fifth and sixth words are interchanged up to the last letter, what would be the tenth letter from right?"
           }
         ],
         subQuestions: [
           {
             id: "s1-1-1",
-            hardness: "easy",
-            content: [{ type: "text", value: "From the passage, we can conclude that there is possibility of life on any planet other than Earth:" }],
-            options: ["No", "Very low", "Very high", "Cannot be determined"],
-            type: "mcq"
-          },
-          {
-            id: "s1-1-2",
-            hardness: "easy",
-            content: [{ type: "text", value: "Icarus is a/an:" }],
-            options: ["Astrology journal", "Weekly magazine", "Aircraft", "Astronomy journal"],
-            type: "mcq"
-          },
-          {
-            id: "s1-1-3",
             hardness: "medium",
-            content: [{ type: "text", value: "The simulations conducted showed all of the following results EXCEPT:" }],
-            options: [
-              "Each simulation produced one to four Earth-like planets.",
-              "Earth-like planets may be quite common",
-              "Earth-like planet formation occurred in about 25% of the cases",
-              "Earth-like planet formation of a much larger size with hydrogen seas instead of water."
-            ],
-            type: "mcq"
-          },
-          {
-            id: "s1-1-4",
-            hardness: "medium",
-            content: [{ type: "text", value: "Greg Laughlin is:" }],
-            options: [
-              "An astronomer",
-              "An expert on planet formation",
-              "Both an astronomer and an expert on planet formation",
-              "Lead author of Icarus"
-            ],
-            type: "mcq"
-          },
-          {
-            id: "s1-1-5",
-            hardness: "medium",
-            content: [{ type: "text", value: "What can be said about the simulations?" }],
-            options: [
-              "They were conducted and the results taken from a real life situation.",
-              "They were sampled exactly in the conditions in which the planets in a galaxy are formed.",
-              "In about a quarter of the cases an Earth like planet was formed.",
-              "The simulations show that the variety of planets forming is very low."
-            ],
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["T", "I", "O", "None of these"],
             type: "mcq"
           }
         ]
       },
+
+      // Q2
       {
         id: "s1-2",
         hardness: "medium",
-        content: [{ type: "text", value: "Choose the correct prepositions to fill in the blanks:" }],
+        content: [
+          {
+            type: "text",
+            value: "What is the largest prime number that can be stored in an 8-bit memory?"
+          }
+        ],
         subQuestions: [
           {
             id: "s1-2-1",
-            hardness: "easy",
-            content: [{ type: "text", value: "The speech was filled ___ examples." }],
-            options: ["From", "Of", "With", "In"],
-            type: "mcq"
-          },
-          {
-            id: "s1-2-2",
-            hardness: "easy",
-            content: [{ type: "text", value: "The subscription rate of a magazine is Rs.50 ___ the first three months and this increases to Rs.120 if it is ___ one year." }],
-            options: ["In, from", "For, for", "For, of", "In, for"],
-            type: "mcq"
-          },
-          {
-            id: "s1-2-3",
-            hardness: "easy",
-            content: [{ type: "text", value: "We found it difficult to agree ___ what to do with the money." }],
-            options: ["On", "For", "At", "With"],
-            type: "mcq"
-          },
-          {
-            id: "s1-2-4",
-            hardness: "easy",
-            content: [{ type: "text", value: "The Germans suffered heavy losses ___ World War II." }],
-            options: ["From", "During", "Into", "With"],
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["256", "257", "128", "127"],
             type: "mcq"
           }
         ]
       },
+
+      // Q3
       {
         id: "s1-3",
         hardness: "medium",
-        content: [{ type: "text", value: "Choose the word nearest in meaning to the word highlighted:" }],
+        content: [
+          {
+            type: "text",
+            value: "A man, a woman, and a child can do a piece of work in 6 days. Man only can do it in 24 days. Woman can do it in 16 days and in how many days child can do the same work?"
+          }
+        ],
         subQuestions: [
           {
             id: "s1-3-1",
-            hardness: "easy",
-            content: [{ type: "text", value: "The doctor in the village turned out to be a *QUACK*." }],
-            options: ["Duck Lover", "Pretender", "Duck Hater", "Genius"],
-            type: "mcq"
-          },
-          {
-            id: "s1-3-2",
-            hardness: "easy",
-            content: [{ type: "text", value: "Is there any *ALTERNATE* method to arrive at the answer?" }],
-            options: ["Different", "Easy", "Substitute", "Effective"],
-            type: "mcq"
-          },
-          {
-            id: "s1-3-3",
-            hardness: "easy",
-            content: [{ type: "text", value: "At the party, she was *PIQUED* with the gentleman in the red shirt." }],
-            options: ["Annoyed", "Pleased", "Flirting", "Shy"],
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["16", "24", "32", "None of these"],
             type: "mcq"
           }
         ]
       },
+
+      // Q4
       {
         id: "s1-4",
         hardness: "medium",
-        content: [{ type: "text", value: "Choose the correct articles to fill in the blanks:" }],
+        content: [
+          {
+            type: "text",
+            value: "In which of the system, decimal number 194 is equal to 1234?"
+          }
+        ],
         subQuestions: [
           {
             id: "s1-4-1",
-            hardness: "easy",
-            content: [{ type: "text", value: "___ first episode of the new serial is going on air tonight." }],
-            options: ["The", "A", "An", "No article required"],
-            type: "mcq"
-          },
-          {
-            id: "s1-4-2",
-            hardness: "easy",
-            content: [{ type: "text", value: "He remembered that ___ moon looked lovely that night." }],
-            options: ["A", "An", "The", "No article required"],
-            type: "mcq"
-          },
-          {
-            id: "s1-4-3",
-            hardness: "easy",
-            content: [{ type: "text", value: "___ engineers, who appeared for ___ test and failed, were given ___ alternative to join as assistants in a different department." }],
-            options: [
-              "The, the, a",
-              "The, the, an",
-              "An, a, the",
-              "An, an, an"
-            ],
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct base:" }],
+            options: ["3", "6", "7", "5"],
             type: "mcq"
           }
         ]
       },
+
+      // Q5
       {
         id: "s1-5",
         hardness: "medium",
-        content: [{ type: "text", value: "Choose the word nearest in meaning to the word highlighted:" }],
+        content: [
+          {
+            type: "text",
+            value: "Find the value of the 678 to the base 7."
+          }
+        ],
         subQuestions: [
           {
             id: "s1-5-1",
-            hardness: "easy",
-            content: [{ type: "text", value: "The *BOUNTIES* of nature are being exploited by man." }],
-            options: ["Gifts", "Products", "Rules", "Ecological balances"],
-            type: "mcq"
-          },
-          {
-            id: "s1-5-2",
-            hardness: "easy",
-            content: [{ type: "text", value: "The minister *CORROBORATED* the statement of his party president." }],
-            options: ["Condemned", "Confirmed", "Denied", "Accepted"],
-            type: "mcq"
-          },
-          {
-            id: "s1-5-3",
-            hardness: "easy",
-            content: [{ type: "text", value: "He is a *CANDID* politician." }],
-            options: ["Frank", "Faithful", "Fearless", "Soft-spoken"],
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["1656", "1656", "1754", "None of these"],
             type: "mcq"
           }
         ]
       },
+
+      // Q6
       {
         id: "s1-6",
         hardness: "medium",
-        content: [{ type: "text", value: "Choose the correct articles to fill the blanks:" }],
+        content: [
+          {
+            type: "text",
+            value: "Number of faces, vertices and edges of a cube:"
+          }
+        ],
         subQuestions: [
           {
             id: "s1-6-1",
             hardness: "easy",
-            content: [{ type: "text", value: "Please nominate ___ few delegates from your organisation to attend ___ seminar scheduled tomorrow." }],
-            options: ["The, a", "The, an", "An, a", "A, the"],
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["6,8,12", "12,8,6", "Undetermined", "None of these"],
             type: "mcq"
-          },
+          }
+        ]
+      },
+
+      // Q7
+      {
+        id: "s1-7",
+        hardness: "medium",
+        content: [
           {
-            id: "s1-6-2",
-            hardness: "easy",
-            content: [{ type: "text", value: "We keep ___ open door policy." }],
-            options: ["An", "The", "A", "No article required"],
+            type: "text",
+            value: "Find the value of @@+25-++@16, where @ denotes 'square' and + denotes 'square root'."
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-7-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["101", "111", "121", "131"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q8
+      {
+        id: "s1-8",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "Find the result of the following expression if, M denotes modulus operation, R denotes round-off, T denotes truncation: M(373,5)+R(3.4)+T(7.7)+R(5.8)"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-8-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["16", "17", "18", "19"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q9
+      {
+        id: "s1-9",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "If TAFJHH is coded as RBEKGI then RBDJK can be coded as ---------"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-9-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["PCCKJ", "PCCKH", "PCDKJ", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q10
+      {
+        id: "s1-10",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "What is the max possible 3 digit prime number?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-10-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["993", "989", "997", "991"],
+            type: "mcq"
+          }
+        ]
+      },
+    
+      // Q11
+      {
+        id: "s1-11",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "A power unit is there by the bank of the river of 750 meters width. A cable is made from power unit to power a plant opposite to that of the river and 1500mts away from the power unit. The cost of the cable below water is Rs. 15/- per meter and cost of cable on the bank is Rs.12/- per meter. Find the total of laying the cable."
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-11-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["20250", "20500", "20514", "20600"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q12
+      {
+        id: "s1-12",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "In Madras, temperature at noon varies according to -t^2/2 + 8t + 3, where t is elapsed time. Find how much temperature more or less in 4pm to 9pm."
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-12-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["3.85", "3.57", "3.26", "None Of These"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q13
+      {
+        id: "s1-13",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "A man, a woman, and a child can do a piece of work in 6 days. Man only can do it in 24 days. Woman can do it in 16 days and in how many days child can do the same work?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-13-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["24 Days", "18 Days", "16 Days", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q14
+      {
+        id: "s1-14",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "If VXUPLVH is written as SURMISE, what is SHDVD?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-14-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct answer:" }],
+            options: ["PEATA", "PEBSA", "PEASB", "PEASA"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q15
+      {
+        id: "s1-15",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "If A, B and C are the mechanisms used separately to reduce the wastage of fuel by 30%, 20% and 10%. What will be the fuel economy if they were used combined."
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-15-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["25%", "18%", "16%", "20%"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q16
+      {
+        id: "s1-16",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "What is the power of 2?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-16-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["2068", "2048", "2668", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q17
+      {
+        id: "s1-17",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "Complete the series. 3, 8, --, 24, --, 48, 63"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-17-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["15, 35", "15, 25", "15, 45", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q18
+      {
+        id: "s1-18",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "Complete the series. 4, -5, 11, -14, 22, ---"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-18-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["18", "24", "27", "None of These"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q19
+      {
+        id: "s1-19",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "A Flight takes off at 2 A.M from northeast direction and travels for 11 hours to reach the destination which is in north west direction. Given the latitude and longitude of source and destination. Find the local time of destination when the flight reaches there?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-19-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["1.00AM", "2.00PM", "2.00AM", "1:00PM"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q20
+      {
+        id: "s1-20",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "A can copy 50 papers in 10 hours while both A & B can copy 70 papers in 10 hours. Then for how many hours required for B to copy 26 papers?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s1-20-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["10", "13", "17", "20"],
             type: "mcq"
           }
         ]
       }
     ]
   },
-    {
-    section: "Analytical & Numerical Ability",
+  {
+    section: "Numerical & Mathematical Ability",
     questions: [
+      // Q21
       {
-        id: "s2-1",
+        id: "s2-21",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value:
-              "In August, a cricket team that played 120 matches won 20% of the games it played. After a continuous winning streak, this team raised its average to 52%. How many matches did the team win to attain this average?",
-          },
+            value: "A is twice efficient than B. A and B can both work together to complete a work in 7 days. Then find in how many days A alone can complete the work?"
+          }
         ],
         subQuestions: [
           {
-            id: "s2-1-1",
+            id: "s2-21-1",
             hardness: "medium",
             content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["40", "52", "68", "80"],
-            type: "mcq",
-          },
-        ],
+            options: ["10.5 Days", "10.2 Days", "7.5 Days", "None of these"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q22
       {
-        id: "s2-2",
-        hardness: "easy",
-        content: [
-          {
-            type: "text",
-            value: "If 75% of a number is 90, what is the number?",
-          },
-        ],
-        subQuestions: [
-          {
-            id: "s2-2-1",
-            hardness: "easy",
-            content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["100", "125", "120", "67.5"],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s2-3",
+        id: "s2-22",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value:
-              "After giving a discount of Rs.45 the shopkeeper still gets a profit of 20%, if the cost price is Rs.180. Find the mark-up percent.",
-          },
+            value: "A finish the work in 10 days. B is 60% efficient than A. So how many days does B take to finish the work?"
+          }
         ],
         subQuestions: [
           {
-            id: "s2-3-1",
+            id: "s2-22-1",
             hardness: "medium",
             content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["0.4", "0.55", "0.45", "0.48"],
-            type: "mcq",
-          },
-        ],
+            options: ["6 Days", "8 Days", "3 Days", "4 Days"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q23
       {
-        id: "s2-4",
+        id: "s2-23",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value:
-              "If 50 people finish a job in 10 days, how long will it take 20 people to finish the same job?",
-          },
+            value: "A finishes the work in 10 days & B in 8 days individually. If A works for only 6 days then how many days should B work to complete A's work?"
+          }
         ],
         subQuestions: [
           {
-            id: "s2-4-1",
+            id: "s2-23-1",
             hardness: "medium",
             content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["25", "50", "4", "None of the options"],
-            type: "mcq",
-          },
-        ],
+            options: ["3.2 Days", "3.6 Days", "4.2 Days", "None of these"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q24
       {
-        id: "s2-5",
+        id: "s2-24",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value:
-              "If the ages of a husband and a wife are in the ratio 5:4 and the sum of their ages is 45, what is the difference between their ages?",
-          },
+            value: "A 2D array is declared as A[9,7] and each element requires 2 byte. If A[1,1] is stored in 3000. Find the memory of A[8,5]?"
+          }
         ],
         subQuestions: [
           {
-            id: "s2-5-1",
-            hardness: "easy",
-            content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["4 years", "5 years", "3 years", "6 years"],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s2-6",
-        hardness: "medium",
-        content: [
-          {
-            type: "text",
-            value:
-              "Nita, Gita, Sita and Rita travelled in airplane, car, bus and train (not necessarily in that order). Sita did not travel by train. Gita travelled by car. Rita travelled neither by car nor by train. Sita could not travel by airplane due to health problems. Nita did not go by bus.",
-          },
-        ],
-        subQuestions: [
-          {
-            id: "s2-6-1",
-            hardness: "easy",
-            content: [{ type: "text", value: "Who travelled by train?" }],
-            options: ["Nita", "Rita", "Sita", "None of the options"],
-            type: "mcq",
-          },
-          {
-            id: "s2-6-2",
-            hardness: "easy",
-            content: [{ type: "text", value: "By which mode of transport did Sita travel?" }],
-            options: ["Airplane", "Train", "Bus", "None of the options"],
-            type: "mcq",
-          },
-          {
-            id: "s2-6-3",
-            hardness: "easy",
-            content: [{ type: "text", value: "Who travelled by airplane?" }],
-            options: ["Nita", "Rita", "Sita", "Gita"],
-            type: "mcq",
-          },
-          {
-            id: "s2-6-4",
-            hardness: "easy",
-            content: [{ type: "text", value: "If Gita interchanges her mode of transport with Sita, then by which mode would Gita travel?" }],
-            options: ["Car", "Bus", "Airplane", "None of the options"],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s2-7",
-        hardness: "medium",
-        content: [
-          { type: "text", value: "If RAGHU is written as GRUHA, what is the code for SHILU?" },
-        ],
-        subQuestions: [
-          {
-            id: "s2-7-1",
-            hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct code:" }],
-            options: ["LSHUI", "SILUH", "ISULH", "ISUHL"],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s2-11",
-        hardness: "medium",
-        content: [
-          {
-            type: "text",
-            value:
-              "Given below are four figures, of which three are similar and the fourth one is different. Find the odd figure.",
-          },
-          { type: "image", value: "/baseline-3/s2-11.png" },
-        ],
-        subQuestions: [
-          {
-            id: "s2-11-1",
-            hardness: "medium",
-            content: [{ type: "text", value: "Choose the odd figure:" }],
-            options: ["A", "B", "C", "D"],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s2-12",
-        hardness: "medium",
-        content: [
-          {
-            type: "text",
-            value:
-              "Three figures are given that follow a certain sequence or pattern. Find the next figure in the sequence from the answer choices provided below.",
-          },
-          { type: "image", value: "/baseline-3/s2-12.png" },
-        ],
-        subQuestions: [
-          {
-            id: "s2-12-1",
-            hardness: "medium",
-            content: [{ type: "text", value: "Choose the next figure:" }],
-            options: ["A", "B", "C", "D"],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s2-13",
-        hardness: "medium",
-        content: [
-          {
-            type: "text",
-            value:
-              "Each question has two statements and some conclusions. Choose the conclusion that logically follows:\n\nAll pens are books. Some pens are pencils.",
-          },
-        ],
-        subQuestions: [
-          {
-            id: "s2-13-1",
-            hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct conclusion:" }],
-            options: [
-              "Some pencils are pens.",
-              "Some books are pencils.",
-              "All pens are pencils.",
-              "None of the options",
-            ],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s2-14",
-        hardness: "medium",
-        content: [
-          {
-            type: "text",
-            value:
-              "Statement: Either Ravi goes to the market or Shyam sings a song.\nInference: Ravi did not go to the market, so Shyam must be singing.",
-          },
-        ],
-        subQuestions: [
-          {
-            id: "s2-14-1",
-            hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct inference:" }],
-            options: ["A", "B", "C", "D"],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s2-15",
-        hardness: "medium",
-        content: [
-          {
-            type: "text",
-            value:
-              "Conclusion: Anand is intelligent without an education.\nStatement I: Anand is not educated but he is intelligent.\nStatement II: Education has not made Anand intelligent.",
-          },
-        ],
-        subQuestions: [
-          {
-            id: "s2-15-1",
+            id: "s2-24-1",
             hardness: "medium",
             content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["1", "2", "3", "4"],
-            type: "mcq",
-          },
-        ],
+            options: ["3106", "3206", "3612", "None of these"],
+            type: "mcq"
+          }
+        ]
       },
-    ],
+
+      // Q25
+      {
+        id: "s2-25",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "Given $ means Tripling and % means change of sign then find the value of $%$6-%$%6"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-25-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["-72", "-64", "-68", "None Of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q26
+      {
+        id: "s2-26",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "My flight takes of at 2am from a place at 18N 10E and landed 10 Hrs later at a place with coordinates 36N70W. What is the local time when my plane landed. (Hint: Every 1 deg longitude is equal to 4 minutes. If west to east add time else subtract time)"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-26-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["6:00am", "6:40am", "7:40am", "8:00am"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q27
+      {
+        id: "s2-27",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "Which is the smallest no divides 2880 and gives a perfect square?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-27-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["1", "2", "5", "6"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q28
+      {
+        id: "s2-28",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "Form 8 digit numbers from by using 1, 2, 3, 4, 5 with repetition is allowed and must be divisible by 4?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-28-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["31250", "97656", "78125", "97657"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q29
+      {
+        id: "s2-29",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "One problem on (a³-b³)/(a²+ab+b²)"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-29-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["a-b", "a+b", "a*b", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q30
+      {
+        id: "s2-30",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "Rearrange and categorize the word 'RAPETEKA'?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-30-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["Animal", "Reptile", "Humans", "Bird"],
+            type: "mcq"
+          }
+        ]
+      },
+      // Q31
+      {
+        id: "s2-31",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "In school there are some bicycles and 4-wheeler wagons. One Tuesday there are 190 wheels in the campus. How many bicycles are there?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-31-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["15", "12", "10", "8"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q32
+      {
+        id: "s2-32",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "Key words in question (Fibonacci series, infinite series, in the middle of the question one number series is there). I got the series 3 12 7 26 15 ? (Logic: 3*2+1=7  12*2+2=26  7*2+1=15   26*2+2=54)"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-32-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["27", "36", "48", "54"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q33
+      {
+        id: "s2-33",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "(1/2) of a number is 3 times more than the (1/6) of the same number?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-33-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["9", "4", "6", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q34
+      {
+        id: "s2-34",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "There are two pipes A and B. If A filled 10 liters in hour B can fills 20 liters in same time. Likewise B can fill 10, 20, 40, 80, 160….if B filled in (1/16)th of a tank in 3 hours, how much time will it take to fill completely"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-34-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["7 hours", "6 hours", "8 hours", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q35
+      {
+        id: "s2-35",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "The difference between two numbers is 5 and product of two numbers is 14, what is the squares of sum of number.."
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-35-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["109", "110", "111", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q36
+      {
+        id: "s2-36",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "A man is standing before a painting of a man and he says I have no bro and sis and his father is my father's son?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-36-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["His Nephew", "His Father", "His Grand Son", "His Son"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q37
+      {
+        id: "s2-37",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "What is the value of [(3x+8Y)/(x-2Y)]; if x/2y=2?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-37-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["5", "8", "10", "15"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q38
+      {
+        id: "s2-38",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "One grandfather has three grandchildren, two of their age difference is 3, eldest child age is 3 times youngest child's age and eldest child's age is two times of sum of other two children. What is the age of eldest child?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-38-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["5", "10", "15", "20"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q39
+      {
+        id: "s2-39",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "In a market 4 man are standing. The average age of the four before 4years is 45, after some days one man is added and his age is 49. What is the average weight of all?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-39-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["49", "51", "53", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q40
+      {
+        id: "s2-40",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "KEYWORDS: one organization, material labor and maintenance are in the ratio of 4:6:7, the material cost is - 100, what is the total cost?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-40-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["360", "412", "420", "425"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q41
+      {
+        id: "s2-41",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "KEYWORDS: Sports readers, 10 tables, 4 chairs per table, each table has different number of people then how many tables will left without at least one person?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-41-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["9", "8", "7", "6"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q42
+      {
+        id: "s2-42",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "In a school for a student out of a 100 he got 74 of average for 7 subjects and he got 79 marks in 8th subject. what is the average of all the subjects?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-42-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["74.625", "70.625", "78.325", "None of these"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q43
+      {
+        id: "s2-43",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "In a question, last part has, the ages of two people has the ratio of 6:6 and by adding the numbers we get 44, after how many years the ratio would be 8:7?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-43-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["5", "6", "7", "8"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q44
+      {
+        id: "s2-44",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "One train travels 200m from A to B with 70 km/ph. and returns to A with 80kmph, what is the average of their speed? (APPROX)"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-44-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["72", "74", "78", "80"],
+            type: "mcq"
+          }
+        ]
+      },
+
+      // Q45
+      {
+        id: "s2-45",
+        hardness: "medium",
+        content: [
+          {
+            type: "text",
+            value: "What will come in the next? 1, 2, 4, 13, 31, 112, ………..?"
+          }
+        ],
+        subQuestions: [
+          {
+            id: "s2-45-1",
+            hardness: "medium",
+            content: [{ type: "text", value: "Choose the correct option:" }],
+            options: ["112", "224", "229", "None of these"],
+            type: "mcq"
+          }
+        ]
+      }
+    ]
   },
-    {
-    section: "General Mental Ability",
+  {
+    section: "Test of English Language",
     questions: [
+      // Q46
       {
-        id: "s3-1",
+        id: "s3-46",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value: "Find the percentage of prime numbers present between 1 and 100 (including both).",
-          },
+            value: "Whom (1) / did you talk (2) / to at (3) the information desk at the airport (4)"
+          }
         ],
         subQuestions: [
           {
-            id: "s3-1-1",
+            id: "s3-46-1",
             hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["20", "25", "24", "23"],
-            type: "mcq",
-          },
-        ],
+            content: [{ type: "text", value: "Identify the error:" }],
+            options: ["Whom", "did you talk", "to at", "the information desk at the airport"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q47
       {
-        id: "s3-2",
+        id: "s3-47",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value: "Tom is 25% taller than Amy. By what percent is Amy shorter than Tom?",
-          },
+            value: "Without (1) / saying a word (2) the major (3) gave a nod of ascent (4)"
+          }
         ],
         subQuestions: [
           {
-            id: "s3-2-1",
+            id: "s3-47-1",
             hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["75%", "80%", "25%", "20%"],
-            type: "mcq",
-          },
-        ],
+            content: [{ type: "text", value: "Identify the error:" }],
+            options: ["Without", "saying a word", "the major", "ascent"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q48
       {
-        id: "s3-3",
+        id: "s3-48",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value:
-              "A shopkeeper offered a discount of 15% on the labelled price. By selling an article for Rs.340 after giving discount, he earned a profit of 13⅓%. What would have been the percent profit earned if no discount was offered?",
-          },
+            value: "Just (1) as they were about to go to bed (2) Jane told her mother its (3) my turn to wind the clock (4)"
+          }
         ],
         subQuestions: [
           {
-            id: "s3-3-1",
+            id: "s3-48-1",
             hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["0.2", "0.3333", "0.1717", "0.25"],
-            type: "mcq",
-          },
-        ],
+            content: [{ type: "text", value: "Identify the error:" }],
+            options: ["Just", "as they were about to go to bed", "its", "my turn to wind the clock"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q49
       {
-        id: "s3-4",
-        hardness: "medium",
-        content: [
-          { type: "text", value: "If a:b = 3:4 and b:c = 2:7, then what is the value of a:b:c?" },
-        ],
-        subQuestions: [
-          {
-            id: "s3-4-1",
-            hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["3:4:14", "3:4:7", "6:4:7", "6:8:12"],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s3-5",
+        id: "s3-49",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value:
-              "The prices of a refrigerator and a cell phone are in the ratio 3:2. If the refrigerator costs Rs.6000 more than the cell phone, what is the price of the cell phone?",
-          },
+            value: "Everyone (1) is excited about gradation because all (2) had worked (3) so hard for it (4)"
+          }
         ],
         subQuestions: [
           {
-            id: "s3-5-1",
+            id: "s3-49-1",
             hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["Rs.1200", "Rs.12000", "Rs.8000", "Rs.9000"],
-            type: "mcq",
-          },
-        ],
+            content: [{ type: "text", value: "Identify the error:" }],
+            options: ["Everyone", "is excited about", "gradation because all", "so hard for it"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q50
       {
-        id: "s3-6",
+        id: "s3-50",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value:
-              "A room of floor area 3x3 is to be fitted with tiles of size 1x1 of different colors. The black tile is in between the green and the white tiles. The blue tile is adjacent to the red tile. The orange tile is adjacent to the pink tile. The yellow tile is to the right (east) of the red tile, and the violet tile is to the left (west) of the orange tile.",
-          },
+            value: "Preserving (1) rare and valuable books is one (2) of the challenges facing (3) by the librarian of congress (4)"
+          }
         ],
         subQuestions: [
           {
-            id: "s3-6-1",
+            id: "s3-50-1",
             hardness: "medium",
-            content: [{ type: "text", value: "If the yellow tile is to the north of the white tile, and the black tile is between the red and the orange tiles, where is the violet tile?" }],
-            options: [
-              "To the north of the green tile",
-              "To the west of the orange tile",
-              "To the east of the blue tile",
-              "None of the options",
-            ],
-            type: "mcq",
-          },
-          {
-            id: "s3-6-2",
-            hardness: "medium",
-            content: [{ type: "text", value: "If the blue tile is present between the green and the violet tiles, the black tile will be to the north of:" }],
-            options: ["The blue tile", "The red tile", "The orange tile", "Cannot be determined"],
-            type: "mcq",
-          },
-          {
-            id: "s3-6-3",
-            hardness: "medium",
-            content: [{ type: "text", value: "If the pink tile is between the yellow and the white tiles, which of the following is/are TRUE?" }],
-            options: [
-              "The orange tile is between the red and the black tiles.",
-              "The blue tile is to the east of the red tile.",
-              "The yellow tile is to the west of the red tile.",
-              "All the options",
-            ],
-            type: "mcq",
-          },
-          {
-            id: "s3-6-4",
-            hardness: "medium",
-            content: [{ type: "text", value: "If the orange tile is between the black and the red tiles, and the orange tile is to the north of the red tile, which of the following is definitely FALSE?" }],
-            options: [
-              "The green tile is to the north of the violet tile.",
-              "The white tile is to the south of the pink tile.",
-              "The orange tile is to the left of the pink tile.",
-              "The red tile is to the left of the yellow tile.",
-            ],
-            type: "mcq",
-          },
-        ],
+            content: [{ type: "text", value: "Identify the error:" }],
+            options: ["Preserving", "rare and valuable books is one", "of the challenges facing", "by the librarian of congress"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q51
       {
-        id: "s3-7",
+        id: "s3-51",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value: "If in a certain language, MUSIC is coded as LSPEX. How will SOUND be coded in that language?",
-          },
+            value: "In computer science AI is an intelligence (51) by machines, in contrast to the natural intelligence displayed by humans and other animals."
+          }
         ],
         subQuestions: [
           {
-            id: "s3-7-1",
+            id: "s3-51-1",
             hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct code:" }],
-            options: ["RMRJY", "RNTMC", "RNTJY", "RMJTY"],
-            type: "mcq",
-          },
-        ],
+            content: [{ type: "text", value: "Fill in the blank:" }],
+            options: ["EXHIBITED", "DEMONSTRATED", "MODELED", "PROJECTED"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q52
       {
-        id: "s3-11",
+        id: "s3-52",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value: "Given below are four figures, of which three are similar and the fourth one is different. Find the odd figure.",
-          },
-          { type: "image", value: "/baseline-3/s3-11.png" },
+            value: "Any device that (52) its environment and takes actions that maximizes its chance of successfully achieving its goals."
+          }
         ],
         subQuestions: [
           {
-            id: "s3-11-1",
+            id: "s3-52-1",
             hardness: "medium",
-            content: [{ type: "text", value: "Choose the odd figure:" }],
-            options: ["A", "B", "C", "D"],
-            type: "mcq",
-          },
-        ],
+            content: [{ type: "text", value: "Fill in the blank:" }],
+            options: ["COMMANDS", "RESPONDS", "PERCEIVES", "UNDERSTANDS"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q53
       {
-        id: "s3-12",
+        id: "s3-53",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value: "Three figures are given that follow a certain sequence or pattern. Find the next figure in the sequence from the answer choices provided below.",
-          },
-          { type: "image", value: "/baseline-3/s3-12.png" },
+            value: "Colloquially, the term AI is used to describe machines (53) that human brains associate with other human brains, such as learning and problem solving."
+          }
         ],
         subQuestions: [
           {
-            id: "s3-12-1",
+            id: "s3-53-1",
             hardness: "medium",
-            content: [{ type: "text", value: "Choose the next figure:" }],
-            options: ["A", "B", "C", "D"],
-            type: "mcq",
-          },
-        ],
+            content: [{ type: "text", value: "Fill in the blank:" }],
+            options: ["SUBLIMATE", "DUPE", "MIME", "MIMIC"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q54
       {
-        id: "s3-13",
+        id: "s3-54",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value:
-              "Each question has two statements and some conclusions. Choose the conclusion that logically follows:\n\nAll mangoes are apples. All apples are sweet.",
-          },
+            value: "The was founded on the (54) that human intelligence can be so precisely described that a machine can be made to simulate it."
+          }
         ],
         subQuestions: [
           {
-            id: "s3-13-1",
+            id: "s3-54-1",
             hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct conclusion:" }],
-            options: [
-              "All mangoes are sweet.",
-              "Some mangoes are sweet.",
-              "Some mangoes are not sweet.",
-              "Both A and B",
-            ],
-            type: "mcq",
-          },
-        ],
+            content: [{ type: "text", value: "Fill in the blank:" }],
+            options: ["CLAIM", "MEASURE", "MARATHON", "PREJUDICE"],
+            type: "mcq"
+          }
+        ]
       },
+
+      // Q55
       {
-        id: "s3-14",
+        id: "s3-55",
         hardness: "medium",
         content: [
           {
             type: "text",
-            value:
-              "Statement: Only educated people can find a solution.\nInference: No uneducated person can find a solution.",
-          },
+            value: "This raises philosophical arguments about the nature of mind and ethics of creating artificial beings (55) with human like intelligent."
+          }
         ],
         subQuestions: [
           {
-            id: "s3-14-1",
+            id: "s3-55-1",
             hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct inference:" }],
-            options: ["A", "B", "C", "D"],
-            type: "mcq",
-          },
-        ],
-      },
-      {
-        id: "s3-15",
-        hardness: "medium",
-        content: [
-          {
-            type: "text",
-            value:
-              "Conclusion: The foundation stone for the building is laid.\nStatement I: Without a foundation, a building cannot be raised.\nStatement II: Ministers lay foundation stones.",
-          },
-        ],
-        subQuestions: [
-          {
-            id: "s3-15-1",
-            hardness: "medium",
-            content: [{ type: "text", value: "Choose the correct option:" }],
-            options: ["1", "2", "3", "4"],
-            type: "mcq",
-          },
-        ],
-      },
-    ],
-  },
+            content: [{ type: "text", value: "Fill in the blank:" }],
+            options: ["INTEGRATED", "ENDOWED", "INSTIGATED", "IMITED"],
+            type: "mcq"
+          }
+        ]
+      }
+    ]
+  }
 ];
 
-export const baselineAnswersV3: Record<string, string>= {
-  // Section 1: Verbal Ability
-  "s1-1-1": "Very low",
-  "s1-1-2": "Astronomy journal",
-  "s1-1-3": "Earth-like planet formation of a much larger size with hydrogen seas instead of water.",
-  "s1-1-4": "An astronomer",
-  "s1-1-5": "In about a quarter of the cases an Earth like planet was formed.",
-  "s1-2-1": "With",
-  "s1-2-2": "For, for",
-  "s1-2-3": "With",
-  "s1-2-4": "During",
-  "s1-3-1": "Pretender",
-  "s1-3-2": "Substitute",
-  "s1-3-3": "Annoyed",
-  "s1-4-1": "The",
-  "s1-4-2": "The",
-  "s1-4-3": "The, the, an",
-  "s1-5-1": "Gifts",
-  "s1-5-2": "Confirmed",
-  "s1-5-3": "Frank",
-  "s1-6-1": "A, the",
-  "s1-6-2": "An",
+// ============================
+// UPDATED ANSWERS OBJECT
+// ============================
 
-  // Section 2: Analytical & Numerical Ability
-  "s2-1-1": "80",
-  "s2-2-1": "120",
-  "s2-3-1": "0.45",
-  "s2-4-1": "25",
-  "s2-5-1": "5 years",
-  "s2-6-1": "Nita",
-  "s2-6-2": "Bus",
-  "s2-6-3": "Rita",
-  "s2-6-4": "Bus",
-  "s2-7-1": "ISULH",
-  "s2-11-1": "C",
-  "s2-12-1": "B",
-  "s2-13-1": "None of the options",
-  "s2-14-1": "A",
-  "s2-15-1": "1",
+export const baselineAnswersV4: Record<string, string> = {
+  // Section 1 - Logical & Analytical (Q1-20)
+  "s1-1-1": "I",
+  "s1-2-1": "127",
+  "s1-3-1": "16",
+  "s1-4-1": "5",
+  "s1-5-1": "1656",
+  "s1-6-1": "6,8,12",
+  "s1-7-1": "121",
+  "s1-8-1": "19",
+  "s1-9-1": "PCCKJ",
+  "s1-10-1": "997",
+  
+  "s1-11-1": "20250",
+  "s1-12-1": "3.57",
+  "s1-13-1": "16 Days",
+  "s1-14-1": "PEASA",
+  "s1-15-1": "20%",
+  "s1-16-1": "2048",
+  "s1-17-1": "15, 35",
+  "s1-18-1": "27",
+  "s1-19-1": "1:00PM",
+  "s1-20-1": "13",
 
-  // Section 3: General Mental Ability
-  "s3-1-1": "25",
-  "s3-2-1": "20%",
-  "s3-3-1": "0.3333",
-  "s3-4-1": "3:4:14",
-  "s3-5-1": "Rs.12000",
-  "s3-6-1": "To the east of the blue tile",
-  "s3-6-2": "The red tile",
-  "s3-6-3": "The orange tile is between the red and the black tiles.",
-  "s3-6-4": "The orange tile is to the left of the pink tile.",
-  "s3-7-1": "RMRJY",
-  "s3-11-1": "D",
-  "s3-12-1": "C",
-  "s3-13-1": "Both A and B",
-  "s3-14-1": "A",
-  "s3-15-1": "4"
-}
+  // Section 2 - Numerical & Mathematical (Q21-45)
+  "s2-21-1": "10.5 Days",
+  "s2-22-1": "4 Days",
+  "s2-23-1": "3.2 Days",
+  "s2-24-1": "3106",
+  "s2-25-1": "None Of these",
+  "s2-26-1": "8:00am",
+  "s2-27-1": "5",
+  "s2-28-1": "78125",
+  "s2-29-1": "a-b",
+  "s2-30-1": "Bird",
+  
+  "s2-31-1": "15",
+  "s2-32-1": "54",
+  "s2-33-1": "6",
+  "s2-34-1": "7 hours",
+  "s2-35-1": "None of these",
+  "s2-36-1": "His Son",
+  "s2-37-1": "10",
+  "s2-38-1": "15",
+  "s2-39-1": "49",
+  "s2-40-1": "425",
+  
+  "s2-41-1": "6",
+  "s2-42-1": "74.625",
+  "s2-43-1": "8",
+  "s2-44-1": "74",
+  "s2-45-1": "None of these",
 
-const returnArr = [baselineQuestionsV3, baselineAnswersV3]
-export default returnArr;
+  // Section 3 - Test of English (Q46-55)
+  "s3-46-1": "Whom",
+  "s3-47-1": "ascent",
+  "s3-48-1": "its",
+  "s3-49-1": "gradation because all",
+  "s3-50-1": "of the challenges facing",
+  "s3-51-1": "DEMONSTRATED",
+  "s3-52-1": "PERCEIVES",
+  "s3-53-1": "MIMIC",
+  "s3-54-1": "CLAIM",
+  "s3-55-1": "ENDOWED"
+};
+
+const retRes = [baselineQuestionsV4, baselineAnswersV4];
+export default retRes;
